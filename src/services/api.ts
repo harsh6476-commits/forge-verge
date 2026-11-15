@@ -48,6 +48,10 @@ export const api = {
     return fetchJson('/days/today');
   },
 
+  async getDailyList(): Promise<DailyPlan[]> {
+    return fetchJson('/days/list');
+  },
+
   async getPlanByDate(date: string): Promise<DailyPlan> {
     return fetchJson(`/days?date=${date}`);
   },
@@ -139,4 +143,3 @@ export const api = {
     return fetchJson(`/notifications/${id}/read`, { method: 'PATCH' });
   },
 };
-

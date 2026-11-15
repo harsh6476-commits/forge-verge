@@ -29,19 +29,23 @@ export const PinGate: React.FC<PinGateProps> = ({ onUnlock, apiUnlock }) => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-slate-100 select-none">
-      <div className="w-full max-w-sm space-y-6 text-center">
-        {/* Brand Icon */}
-        <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-500/20 to-cyan-500/20 border border-teal-500/30 flex items-center justify-center text-teal-400 font-mono text-xl font-bold shadow-lg shadow-teal-500/10">
-          <Lock className="w-5 h-5 text-teal-400" />
+    <div className="min-h-screen bg-canvas flex flex-col items-center justify-center p-6 text-black select-none font-mono">
+      <div className="w-full max-w-sm space-y-6 text-center bg-highlight border-2 border-zinc-200 p-8 rounded-3xl shadow-crisp-lg">
+        {/* Black logo with zinc-200 outline and shadow */}
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-black border-2 border-zinc-200 flex items-center justify-center text-highlight font-bold text-2xl shadow-crisp">
+          <Lock className="w-7 h-7 text-highlight" />
         </div>
 
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-white">FORGE OS</h1>
-          <p className="text-xs text-slate-400 mt-1">Enter your personal access PIN to unlock</p>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-extrabold tracking-widest text-black uppercase">
+            FORGE OS
+          </h1>
+          <p className="text-xs text-black/80 font-bold tracking-wide">
+            ENTER PERSONAL PIN TO UNLOCK
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="relative">
             <input
               type="password"
@@ -53,13 +57,13 @@ export const PinGate: React.FC<PinGateProps> = ({ onUnlock, apiUnlock }) => {
                 setPin(e.target.value);
                 setError('');
               }}
-              className="w-full bg-surface border border-border focus:border-teal-400 rounded-xl py-3 px-4 text-center text-xl tracking-widest text-white outline-none font-mono transition-colors"
+              className="w-full bg-canvas border-2 border-zinc-200 focus:border-black rounded-2xl py-3.5 px-4 text-center text-2xl tracking-widest text-black outline-none font-extrabold transition-all shadow-crisp-sm"
             />
           </div>
 
           {error && (
-            <div className="text-xs text-rose-400 flex items-center justify-center gap-1.5 font-mono">
-              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+            <div className="text-xs text-accent flex items-center justify-center gap-1.5 font-bold tracking-wide">
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}
@@ -67,19 +71,18 @@ export const PinGate: React.FC<PinGateProps> = ({ onUnlock, apiUnlock }) => {
           <button
             type="submit"
             disabled={loading || !pin}
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-slate-950 font-semibold text-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-teal-500/10"
+            className="w-full py-3.5 rounded-2xl bg-accent hover:bg-black text-highlight font-extrabold text-xs uppercase tracking-widest border-2 border-zinc-200 shadow-crisp hover:shadow-crisp-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span>{loading ? 'Verifying...' : 'Unlock Workspace'}</span>
+            <span>{loading ? 'VERIFYING...' : 'UNLOCK WORKSPACE'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        <div className="text-[11px] text-slate-500 flex items-center justify-center gap-1.5 pt-4">
-          <ShieldCheck className="w-3.5 h-3.5 text-teal-500/60" />
-          <span>1-Hour Secure Session · Private Personal OS</span>
+        <div className="text-[11px] text-black/70 flex items-center justify-center gap-1.5 pt-2 font-bold tracking-wide">
+          <ShieldCheck className="w-4 h-4 text-accent" />
+          <span>1-HOUR SECURE SESSION · PRIVATE OS</span>
         </div>
       </div>
     </div>
   );
 };
-

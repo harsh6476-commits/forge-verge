@@ -3,6 +3,7 @@ import { unlockAccess, checkSession, lockAccess } from '../controllers/accessCon
 import {
   getTodayPlan,
   getPlanByDate,
+  getDailyList,
   updateItemCompletion,
   updateSubtopicCompletion,
   updateItemNotes,
@@ -37,6 +38,7 @@ router.use(requireAccess);
 
 // Daily Plans & History
 router.get('/days/today', getTodayPlan);
+router.get('/days/list', getDailyList);
 router.get('/days', getPlanByDate);
 router.get('/days/:date', getPlanByDate);
 router.patch('/days/:date/items/:itemId/completion', updateItemCompletion);
@@ -61,4 +63,3 @@ router.get('/notifications', getNotifications);
 router.patch('/notifications/:id/read', markNotificationAsRead);
 
 export default router;
-

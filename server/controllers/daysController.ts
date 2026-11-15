@@ -24,6 +24,25 @@ export async function getPlanByDate(req: Request, res: Response): Promise<void> 
   }
 }
 
+/**
+ * Returns rolling list of plans for the Daily List view
+ */
+export async function getDailyList(_req: Request, res: Response): Promise<void> {
+  try {
+    const todayStr = formatISTDate();
+    // Pre-generate rolling 30 days starting from today (or roadmap start)
+    const days: any[] = [];
+    for (let i = 0; i < 30; i++) {
+      const dateStr = addDaysToDateStr(todayStr, i);
+      const plan = await getOrCreateDailyPlan(dateStr);
+      days.push(plan);
+    }
+    res.json(days);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Error fetching daily list' });
+  }
+}
+
 export async function updateItemCompletion(req: Request, res: Response): Promise<void> {
   const { date, itemId } = req.params;
   const { completed } = req.body;
@@ -43,12 +62,10 @@ export async function updateItemCompletion(req: Request, res: Response): Promise
 
     item.completed = completed;
     item.progressPct = completed ? 100 : 0;
-    // Mark all subtopics accordingly
     item.subtopics.forEach(s => {
       s.completed = completed;
     });
 
-    // Recompute total plan completion
     recalculatePlanProgress(plan);
     await plan.save();
 
@@ -83,7 +100,6 @@ export async function updateSubtopicCompletion(req: Request, res: Response): Pro
 
     subtopic.completed = completed;
 
-    // Recalculate item progress
     const totalSubtopics = item.subtopics.length;
     const completedSubtopics = item.subtopics.filter(s => s.completed).length;
     item.progressPct = totalSubtopics > 0 ? Math.round((completedSubtopics / totalSubtopics) * 100) : 100;
@@ -130,17 +146,14 @@ export async function getProgressSummary(_req: Request, res: Response): Promise<
     const todayStr = formatISTDate();
     const plans = await DailyPlan.find({}).sort({ date: -1 });
 
-    // Calculate streak
     let streak = 0;
     let checkDate = todayStr;
 
-    // Check today first
     const todayPlan = plans.find(p => p.date === todayStr);
     if (todayPlan && todayPlan.completed) {
       streak += 1;
       checkDate = addDaysToDateStr(todayStr, -1);
     } else {
-      // If today is not completed yet, check if yesterday was completed to keep streak alive
       checkDate = addDaysToDateStr(todayStr, -1);
     }
 
@@ -172,7 +185,7 @@ export async function getProgressSummary(_req: Request, res: Response): Promise<
 export async function getProgressHistory(_req: Request, res: Response): Promise<void> {
   try {
     const plans = await DailyPlan.find({})
-      .select('date journeyDay completionPercentage completed')
+      .select('date journeyDay completionPercentage completed assignedItems')
       .sort({ date: -1 })
       .limit(60);
     res.json(plans);
@@ -197,7 +210,6 @@ function recalculatePlanProgress(plan: any): void {
   plan.completed = completedItems === totalItems;
   if (plan.completed && !wasCompleted) {
     plan.completedAt = new Date();
-    // Fire completion notification asynchronously
     Notification.create({
       title: "Today's learning plan completed!",
       message: 'Great work! All scheduled topics have been completed.',
@@ -209,4 +221,3 @@ function recalculatePlanProgress(plan: any): void {
   }
   plan.updatedAt = new Date();
 }
-

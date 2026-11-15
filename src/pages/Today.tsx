@@ -24,7 +24,6 @@ export const TodayPage: React.FC = () => {
       setDailyPlan(plan);
       setSummary(sum);
 
-      // Default selected topic to first incomplete item, or first item
       if (plan.assignedItems && plan.assignedItems.length > 0) {
         const firstIncomplete = plan.assignedItems.find((i) => !i.completed);
         setSelectedItemId(firstIncomplete ? firstIncomplete.itemId : plan.assignedItems[0].itemId);
@@ -45,9 +44,8 @@ export const TodayPage: React.FC = () => {
       const res = await api.updateSubtopicCompletion(currentDate, itemId, subtopicId, completed);
       setDailyPlan(res.plan);
 
-      // Check if whole day just completed
       if (res.plan.completed && !dailyPlan?.completed) {
-        confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+        confetti({ particleCount: 90, spread: 70, origin: { y: 0.7 } });
       }
     } catch (err) {
       console.error(err);
@@ -60,7 +58,7 @@ export const TodayPage: React.FC = () => {
       setDailyPlan(res.plan);
 
       if (res.plan.completed && !dailyPlan?.completed) {
-        confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+        confetti({ particleCount: 90, spread: 70, origin: { y: 0.7 } });
       }
     } catch (err) {
       console.error(err);
@@ -94,9 +92,9 @@ export const TodayPage: React.FC = () => {
 
   if (loading && !dailyPlan) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-3.5rem)] text-slate-400 font-mono text-xs">
-        <div className="animate-spin mr-3 w-4 h-4 border-2 border-teal-400 border-t-transparent rounded-full"></div>
-        Loading Today's Engineering Schedule...
+      <div className="flex items-center justify-center h-[calc(100vh-4rem)] text-black font-mono text-sm tracking-widest uppercase">
+        <div className="animate-spin mr-3 w-5 h-5 border-2 border-accent border-t-transparent rounded-full" />
+        LOADING TODAY'S SCHEDULE...
       </div>
     );
   }
@@ -110,42 +108,44 @@ export const TodayPage: React.FC = () => {
   const progressPct = dailyPlan?.completionPercentage || 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+    <div className="max-w-7xl mx-auto px-6 sm:px-8 py-8 space-y-8 font-mono">
       {/* Daily Summary & Date Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface border border-border rounded-2xl p-6">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-mono text-teal-400 mb-1">
-            <span>JOURNEY DAY {dailyPlan?.journeyDay || 1}</span>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-highlight border-2 border-zinc-200 rounded-3xl p-6 sm:p-8 shadow-crisp">
+        <div className="space-y-3">
+          <div className="flex items-center gap-2.5 text-xs font-bold text-accent uppercase tracking-widest">
+            <span className="bg-canvas px-3 py-1 rounded-md border-2 border-zinc-200 text-black shadow-crisp-sm">
+              DAY {dailyPlan?.journeyDay || 1}
+            </span>
             <span>·</span>
             <span>PHASE {dailyPlan?.phase || 1}, WEEK {dailyPlan?.week || 1}</span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+          <div className="flex items-center gap-4 flex-wrap">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-black tracking-wider uppercase">
               {formatHumanISTDate(currentDate)}
             </h1>
 
             {/* Date Browsing Navigation */}
-            <div className="flex items-center gap-1 bg-background border border-border rounded-lg p-0.5 text-xs">
+            <div className="flex items-center gap-1.5 bg-canvas border-2 border-zinc-200 rounded-xl p-1 text-xs shadow-crisp-sm">
               <button
                 onClick={() => setCurrentDate(addDaysToDateStr(currentDate, -1))}
-                className="p-1 text-slate-400 hover:text-white transition-colors"
+                className="p-1.5 text-black hover:text-accent font-extrabold"
                 title="Previous Day"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setCurrentDate(formatISTDate())}
-                className="px-2 py-0.5 text-[11px] font-mono text-teal-300 hover:underline"
+                className="px-3.5 py-1 text-xs font-extrabold text-black hover:text-accent uppercase tracking-wider"
               >
                 Today
               </button>
               <button
                 onClick={() => setCurrentDate(addDaysToDateStr(currentDate, 1))}
-                className="p-1 text-slate-400 hover:text-white transition-colors"
+                className="p-1.5 text-black hover:text-accent font-extrabold"
                 title="Next Day"
               >
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -153,24 +153,24 @@ export const TodayPage: React.FC = () => {
 
         {/* Progress Metrics & Bar */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 shrink-0">
-          <div className="flex items-center gap-2 font-mono text-xs">
-            <Flame className="w-5 h-5 text-orange-400 fill-orange-400/20" />
+          <div className="flex items-center gap-3 text-xs bg-canvas px-4 py-3 rounded-2xl border-2 border-zinc-200 shadow-crisp-sm">
+            <Flame className="w-5 h-5 text-accent fill-accent" />
             <div>
-              <div className="text-white font-bold">{summary?.streak || 0} DAY STREAK</div>
-              <div className="text-[10px] text-slate-500 uppercase">Consistent Focus</div>
+              <div className="text-black font-extrabold tracking-wider">{summary?.streak || 0} DAY STREAK</div>
+              <div className="text-[10px] text-black/70 font-bold uppercase tracking-wider">Daily Habit</div>
             </div>
           </div>
 
-          <div className="w-48 space-y-1.5">
-            <div className="flex items-center justify-between text-xs font-mono">
-              <span className="text-white font-bold">{progressPct}%</span>
-              <span className="text-slate-400 text-[11px]">
-                {completedCount} / {totalCount} Completed
+          <div className="w-56 space-y-2.5">
+            <div className="flex items-center justify-between text-xs font-bold tracking-wider">
+              <span className="text-black text-sm font-extrabold">{progressPct}%</span>
+              <span className="text-black/80 text-[11px] font-bold">
+                {completedCount} / {totalCount} DONE
               </span>
             </div>
-            <div className="w-full bg-background rounded-full h-2 overflow-hidden border border-border">
+            <div className="w-full bg-canvas rounded-full h-3.5 overflow-hidden border-2 border-zinc-200 shadow-crisp-sm">
               <div
-                className="bg-gradient-to-r from-teal-400 to-cyan-400 h-full rounded-full transition-all duration-500"
+                className="bg-accent h-full rounded-full transition-all duration-500"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
@@ -180,21 +180,23 @@ export const TodayPage: React.FC = () => {
 
       {/* Completion Banner */}
       {dailyPlan?.completed && (
-        <div className="bg-teal-500/10 border border-teal-500/30 rounded-xl p-3 text-center text-xs text-teal-300 font-medium">
+        <div className="bg-white border-2 border-zinc-200 rounded-2xl p-4 text-center text-xs font-extrabold text-accent tracking-widest shadow-crisp uppercase">
           🎉 Today's learning plan completed. Great work!
         </div>
       )}
 
       {/* Main Two-Panel Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[580px]">
-        {/* Left Side: Today's Learning Topics List (4 Cols) */}
-        <div className="lg:col-span-4 space-y-3">
-          <div className="flex items-center justify-between text-xs font-mono text-slate-400 uppercase tracking-wider px-1">
-            <span>Today's Learning</span>
-            <span>{totalCount} Topics</span>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-[620px]">
+        {/* Left Side: Today's Learning Topics List (5 Cols) */}
+        <div className="lg:col-span-5 space-y-4">
+          <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-widest text-black px-1">
+            <span>TODAY'S LEARNING</span>
+            <span className="bg-highlight px-2.5 py-1 rounded-md border-2 border-zinc-200 shadow-crisp-sm text-[11px]">
+              {totalCount} TOPICS
+            </span>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3.5">
             {dailyPlan?.assignedItems.map((item) => {
               const isSelected = selectedItemId === item.itemId;
               return (
@@ -202,10 +204,10 @@ export const TodayPage: React.FC = () => {
                   key={item.itemId}
                   onClick={() => setSelectedItemId(item.itemId)}
                   className={clsx(
-                    'p-4 rounded-xl border cursor-pointer transition-all flex items-start gap-3',
+                    'p-5 rounded-2xl border-2 transition-all flex items-start gap-4 cursor-pointer',
                     isSelected
-                      ? 'border-teal-400 bg-surface shadow-md shadow-teal-500/5'
-                      : 'border-border/80 hover:border-slate-700 bg-surface/50 text-slate-300'
+                      ? 'bg-highlight border-black shadow-crisp-lg -translate-y-0.5'
+                      : 'bg-highlight/60 hover:bg-highlight border-zinc-200 hover:border-black shadow-crisp-sm text-black'
                   )}
                 >
                   <button
@@ -213,33 +215,35 @@ export const TodayPage: React.FC = () => {
                       e.stopPropagation();
                       handleItemToggle(item.itemId, !item.completed);
                     }}
-                    className="mt-0.5 text-slate-500 hover:text-teal-400 transition-colors shrink-0"
+                    className="mt-1 text-black hover:text-accent transition-colors shrink-0"
                   >
                     {item.completed ? (
-                      <CheckCircle2 className="w-4 h-4 text-teal-400 fill-teal-500/20" />
+                      <CheckCircle2 className="w-5 h-5 text-accent fill-accent/20" />
                     ) : (
-                      <Circle className="w-4 h-4" />
+                      <Circle className="w-5 h-5 text-black/40" />
                     )}
                   </button>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1 text-[10px] font-mono">
-                      <span className="uppercase text-slate-400">{item.category}</span>
-                      <span className="text-teal-400 font-semibold">{item.progressPct}%</span>
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex items-center justify-between gap-1 text-[11px] font-bold">
+                      <span className="uppercase px-2.5 py-0.5 bg-accent text-highlight rounded border border-black text-[10px] tracking-wider">
+                        {item.category}
+                      </span>
+                      <span className="text-black font-extrabold">{item.progressPct}%</span>
                     </div>
 
                     <h3
                       className={clsx(
-                        'text-xs font-semibold mt-1 leading-snug',
-                        item.completed ? 'line-through text-slate-500' : 'text-white'
+                        'text-sm font-extrabold leading-snug tracking-wide',
+                        item.completed ? 'line-through text-black/50' : 'text-black'
                       )}
                     >
                       {item.title}
                     </h3>
 
-                    <div className="flex items-center gap-1 text-[10px] text-slate-500 font-mono mt-2">
-                      <Clock className="w-3 h-3" />
-                      <span>{item.estimatedMinutes}m</span>
+                    <div className="flex items-center gap-1.5 text-xs text-black/75 font-bold pt-1">
+                      <Clock className="w-3.5 h-3.5 text-accent" />
+                      <span>{item.estimatedMinutes}m duration</span>
                     </div>
                   </div>
                 </div>
@@ -248,8 +252,8 @@ export const TodayPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Side: Details of the Selected Topic (8 Cols) */}
-        <div className="lg:col-span-8">
+        {/* Right Side: Details of the Selected Topic (7 Cols) */}
+        <div className="lg:col-span-7">
           {selectedItem ? (
             <TopicDetail
               key={selectedItem.itemId}
@@ -263,8 +267,8 @@ export const TodayPage: React.FC = () => {
               onNextTopic={handleNextTopic}
             />
           ) : (
-            <div className="h-full bg-surface border border-border rounded-2xl flex items-center justify-center text-xs text-slate-500 font-mono">
-              Select a topic on the left to start learning.
+            <div className="h-full bg-highlight border-2 border-zinc-200 rounded-3xl flex items-center justify-center text-xs text-black/70 font-bold p-8 shadow-crisp tracking-wider">
+              SELECT A TOPIC ON THE LEFT TO INSPECT DETAILS.
             </div>
           )}
         </div>
@@ -272,4 +276,3 @@ export const TodayPage: React.FC = () => {
     </div>
   );
 };
-

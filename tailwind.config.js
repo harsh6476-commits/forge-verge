@@ -4,37 +4,43 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        background: '#090a0f',
-        surface: '#12141c',
-        'surface-hover': '#1a1d28',
-        border: '#242838',
-        'border-subtle': '#181b26',
-        primary: {
-          DEFAULT: '#10b981', // Deep Emerald / Green
-          hover: '#059669',
-          light: '#34d399',
-          dark: '#047857',
-        },
-        accent: {
-          blue: '#3b82f6',
-          purple: '#8b5cf6',
-          amber: '#f59e0b',
-          rose: '#f43f5e',
-          cyan: '#06b6d4',
-        },
-        muted: '#8b949e',
-        'muted-foreground': '#c9d1d9',
+        // User color specification:
+        // Main contrast & background: #A5A79B
+        // Highlighted color: #E8D2B5
+        // Contrast adding color to balance out both: #590907
+        // Black logos, text, outline as zinc-200, shadows
+        canvas: '#A5A79B',
+        highlight: '#E8D2B5',
+        accent: '#590907',
+        'accent-hover': '#420605',
+        'accent-soft': '#59090715',
+        ink: '#000000',
+        inkmuted: '#1f201d',
+        outline: '#e4e4e7', // zinc-200
       },
       fontFamily: {
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'Fira Code', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        sans: ['"JetBrains Mono"', 'monospace'],
+      },
+      letterSpacing: {
+        tighter: '-0.02em',
+        tight: '0.01em',
+        normal: '0.05em',
+        wide: '0.08em',
+        wider: '0.12em',
+        widest: '0.18em',
+      },
+      boxShadow: {
+        crisp: '4px 4px 0px 0px rgba(0, 0, 0, 0.95)',
+        'crisp-lg': '6px 6px 0px 0px rgba(0, 0, 0, 0.95)',
+        'crisp-sm': '2px 2px 0px 0px rgba(0, 0, 0, 0.95)',
+        deep: '0 20px 35px -5px rgba(89, 9, 7, 0.3), 0 10px 15px -5px rgba(0, 0, 0, 0.4)',
+        glow: '0 0 20px 2px rgba(89, 9, 7, 0.25)',
       },
     },
   },
   plugins: [],
 }
-

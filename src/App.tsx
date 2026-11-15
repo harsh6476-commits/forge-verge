@@ -4,6 +4,7 @@ import { api } from './services/api';
 import { PinGate } from './components/PinGate';
 import { TopNav } from './components/TopNav';
 import { TodayPage } from './pages/Today';
+import { DailyListPage } from './pages/DailyListPage';
 import { MilestonesPage } from './pages/Milestones';
 import { AppNotification } from './types/api';
 
@@ -60,7 +61,7 @@ export function App() {
 
   if (isAuthenticated === null) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center text-slate-500 font-mono text-xs">
+      <div className="min-h-screen bg-canvas flex items-center justify-center text-black font-mono text-xs tracking-widest uppercase">
         Initializing FORGE OS...
       </div>
     );
@@ -72,7 +73,7 @@ export function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-background text-slate-100 flex flex-col font-sans">
+      <div className="min-h-screen bg-canvas text-black flex flex-col font-mono tracking-wide selection:bg-accent selection:text-highlight">
         {/* Top Header Navigation */}
         <TopNav
           streak={streak}
@@ -81,10 +82,11 @@ export function App() {
           onMarkRead={handleMarkNotificationRead}
         />
 
-        {/* The Only Two Main Pages */}
+        {/* 3 Main Pages: Today, Daily List, Milestones */}
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<TodayPage />} />
+            <Route path="/daily-list" element={<DailyListPage />} />
             <Route path="/milestones" element={<MilestonesPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
