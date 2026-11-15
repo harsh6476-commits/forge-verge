@@ -1,32 +1,59 @@
-# React + TypeScript + Vite
+# FORGE OS — Build Your Engineering Future
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A focused, personal 18-month engineering learning roadmap and daily execution system.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Architecture & Vision
 
-## React Compiler
+FORGE OS is streamlined into **two core views**:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **TODAY (`/`)**: Daily command view with two panels:
+   - **Left**: Today's topics checklist with categories, completion status, duration, and progress percentage.
+   - **Right**: Selected topic inspector with "What You Will Learn", subtopics checklist, practical tasks, expected outcomes, auto-saving personal study notes, and file/screenshot attachments.
+2. **MILESTONES (`/milestones`)**: A winding vertical progression path inspired by Candy Crush covering 12 major milestones across all 6 phases of the 18-month curriculum.
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Tech Stack
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Lucide React, Canvas Confetti.
+- **Backend**: Node.js, Express.js, MongoDB Atlas (Mongoose).
+- **Storage**: Cloudinary (with adaptive client-side WebP compression targeting 300–500 KB).
+- **Access Gate**: Private PIN authentication with 1-hour session expiration via secure HttpOnly cookie.
+
+---
+
+## Getting Started
+
+### 1. Environment Setup
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+Update your credentials in `.env`:
+```env
+PORT=5000
+NODE_ENV=development
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/forge_os?retryWrites=true&w=majority
+APP_ACCESS_PIN=1234
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+CLIENT_ORIGIN=http://localhost:5173
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### 2. Run Locally
+Run both client and server concurrently:
+```bash
+npm run dev
+```
+
+Visit [http://localhost:5173](http://localhost:5173). Enter your PIN (default `1234`) to unlock the workspace.
+
+### 3. Build & Test
+```bash
+npm run build    # Strict TypeScript check & Vite production build
+npm test         # Run Vitest test suite
+npm run lint     # Run Oxlint
+```
