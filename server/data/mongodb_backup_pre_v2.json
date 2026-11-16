@@ -1,0 +1,1530 @@
+{
+  "accesssessions": [],
+  "curriculumitems": [
+    {
+      "_id": "6afa1d089a6fc7a24c487cee",
+      "itemId": "p1_w1_d1_js_closures",
+      "__v": 0,
+      "category": "javascript",
+      "day": 1,
+      "description": "Understand how lexical environments, execution contexts, and closures retain access to outer variables even after the outer function returns.",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 50,
+      "expectedOutcome": "A working script demonstrating closure encapsulation without global state leaks.",
+      "learningObjectives": [
+        "Diagram the scope chain of nested functions",
+        "Implement a private counter module using closure",
+        "Write a generic memoization utility function using closures"
+      ],
+      "order": 1,
+      "phase": 1,
+      "practicalTask": "Write a custom memoization function in pure JS and verify that expensive computations run only once per input.",
+      "subtopics": [
+        {
+          "id": "sub_exec_context",
+          "name": "Execution Context & Call Stack",
+          "description": "Creation phase vs Execution phase; hoisting of var and function declarations.",
+          "explanation": "During creation phase, memory is allocated for variables and functions. Execution phase runs the code line-by-line.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de1214025b"
+        },
+        {
+          "id": "sub_lexical_env",
+          "name": "Lexical Environment & Scope Chain",
+          "description": "How nested functions search outer environments for unresolved identifiers.",
+          "explanation": "Every execution context has a reference to its outer lexical environment, forming the scope chain.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de1214025c"
+        },
+        {
+          "id": "sub_closure_mechanics",
+          "name": "Closure Mechanics & V8 Heap Retention",
+          "description": "Why variables survive when a function completes execution.",
+          "explanation": "If an inner function outlives its enclosing function (e.g., returned or passed as callback), the enclosed variables are preserved in heap memory.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de1214025d"
+        },
+        {
+          "id": "sub_practical_memoize",
+          "name": "Practical Implementation: Memoize & Counter",
+          "description": "Build a private counter and a memoize wrapper.",
+          "explanation": "const memoize = fn => { const cache = {}; return (...args) => { const k = JSON.stringify(args); return cache[k] ??= fn(...args); }; };",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de1214025e"
+        }
+      ],
+      "title": "JavaScript Execution Context & Closures",
+      "type": "topic",
+      "week": 1,
+      "whatYouWillLearn": [
+        "Call stack, Global Execution Context, and Function Execution Contexts",
+        "Lexical scope and scope chain resolution in V8 engine",
+        "Closures in memory: [[Scopes]] internal slot",
+        "Common pitfalls: loop variable scoping (var vs let)",
+        "Practical closure patterns: data privacy, memoization, and factory functions"
+      ]
+    },
+    {
+      "_id": "6afa1d089a6fc7a24c487cef",
+      "itemId": "p1_w1_d1_dsa_arrays",
+      "__v": 0,
+      "category": "dsa",
+      "day": 1,
+      "description": "Master Big-O analysis and fundamental array traversal in C++ using both raw arrays and std::vector.",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 45,
+      "expectedOutcome": "Clean C++ code that passes corner cases: all elements equal, array of size 2, negative numbers.",
+      "learningObjectives": [
+        "Explain contiguous memory access advantages over linked structures",
+        "Write an optimal single-pass algorithm for 2nd largest element in C++",
+        "Benchmark vector vs array indexing in C++"
+      ],
+      "order": 2,
+      "phase": 1,
+      "practicalTask": "Implement findSecondLargest(const std::vector<int>& arr) in C++ handling duplicates and negative numbers.",
+      "subtopics": [
+        {
+          "id": "sub_array_memory",
+          "name": "Array Memory Layout & Cache Locality",
+          "description": "How CPU L1/L2 caches leverage spatial locality with arrays.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de12140263"
+        },
+        {
+          "id": "sub_linear_traversal",
+          "name": "Single-Pass Traversal & Second Largest",
+          "description": "Tracking max1 and max2 simultaneously without auxiliary sorting.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de12140264"
+        },
+        {
+          "id": "sub_complexity_derivation",
+          "name": "Complexity Derivation: O(n) vs O(n log n)",
+          "description": "Why single-pass is mathematically optimal for unsorted inputs.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de12140265"
+        }
+      ],
+      "title": "C++ Array Traversal & Time Complexity",
+      "type": "topic",
+      "week": 1,
+      "whatYouWillLearn": [
+        "Contiguous memory allocation and cache locality benefits of arrays",
+        "O(1) random access math: Base_Address + (Index * Element_Size)",
+        "Linear traversal and single-pass maximum/minimum algorithms",
+        "Finding second largest element in a single pass without sorting (O(n) time, O(1) space)"
+      ]
+    },
+    {
+      "_id": "6afa1d099a6fc7a24c487cf0",
+      "itemId": "p1_w1_d2_js_this_prototypes",
+      "__v": 0,
+      "category": "javascript",
+      "day": 2,
+      "description": "Demystify implicit, explicit (call, apply, bind), new, and lexical (arrow functions) binding of \"this\" alongside the prototype chain.",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 50,
+      "expectedOutcome": "A polyfill passing edge cases with partially applied arguments.",
+      "learningObjectives": [
+        "Predict \"this\" binding in asynchronous callbacks and event handlers",
+        "Implement custom Function.prototype.myBind polyfill",
+        "Explain prototypal delegation in memory"
+      ],
+      "order": 1,
+      "phase": 1,
+      "practicalTask": "Write a polyfill for Function.prototype.bind and test with context loss scenarios in setTimeout.",
+      "subtopics": [
+        {
+          "id": "sub_this_rules",
+          "name": "The 4 Binding Rules of \"this\"",
+          "description": "Default, implicit, explicit, and new keyword precedence.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de12140269"
+        },
+        {
+          "id": "sub_arrow_this",
+          "name": "Arrow Functions & Lexical Binding",
+          "description": "Why arrow functions do not have their own this or arguments.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de1214026a"
+        },
+        {
+          "id": "sub_proto_chain",
+          "name": "Prototype Chain & Method Delegation",
+          "description": "How property lookups traverse up to Object.prototype.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de1214026b"
+        }
+      ],
+      "title": "JavaScript \"this\", Prototypes & Inheritance",
+      "type": "topic",
+      "week": 1,
+      "whatYouWillLearn": [
+        "The 4 binding rules of \"this\"",
+        "Arrow functions and lexical \"this\" inheritance",
+        "Prototype chain: Object.prototype, Function.prototype, __proto__ vs prototype",
+        "ES6 Class syntax desugared into prototypal inheritance"
+      ]
+    },
+    {
+      "_id": "6afa1d099a6fc7a24c487cf1",
+      "itemId": "p1_w1_d2_dsa_hashing",
+      "__v": 0,
+      "category": "dsa",
+      "day": 2,
+      "description": "Learn hash tables, collision resolution (chaining vs open addressing), and std::unordered_map in C++ for O(1) lookups.",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 45,
+      "expectedOutcome": "Submitted and accepted C++ solution with 0ms or optimal runtime.",
+      "learningObjectives": [
+        "Implement Two Sum in C++ in O(n) time and O(n) space",
+        "Explain hash collisions and worst-case O(n) behavior"
+      ],
+      "order": 2,
+      "phase": 1,
+      "practicalTask": "Solve Two Sum on LeetCode using std::unordered_map in a single pass.",
+      "subtopics": [
+        {
+          "id": "sub_hash_theory",
+          "name": "Hash Function & Collision Resolution",
+          "description": "Separate chaining vs Linear Probing.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de1214026f"
+        },
+        {
+          "id": "sub_cpp_unordered_map",
+          "name": "std::unordered_map in C++",
+          "description": "Key hashing, insertion, find(), and count() methods.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de12140270"
+        },
+        {
+          "id": "sub_two_sum_impl",
+          "name": "Two Sum Problem Implementation",
+          "description": "Single-pass hash map check for target - current.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de12140271"
+        }
+      ],
+      "title": "Hashing Fundamentals & Two Sum in C++",
+      "type": "topic",
+      "week": 1,
+      "whatYouWillLearn": [
+        "Hash functions, buckets, and load factor",
+        "std::unordered_map vs std::map (O(1) average hash vs O(log n) Red-Black Tree)",
+        "Two-Sum problem: Brute force O(n^2) to Hash Map O(n)"
+      ]
+    },
+    {
+      "_id": "6afa1d099a6fc7a24c487cf2",
+      "itemId": "p1_w1_d3_react_hooks",
+      "__v": 0,
+      "category": "react",
+      "day": 3,
+      "description": "Understand how React manages state across renders using fiber nodes and hook linked lists. Avoid state mutation bugs.",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 55,
+      "expectedOutcome": "No memory leak warnings or race conditions when typing rapidly.",
+      "learningObjectives": [
+        "Explain how React pairs state with fiber nodes via index tracking",
+        "Write reliable useEffect cleanup for event listeners and abort controllers"
+      ],
+      "order": 1,
+      "phase": 1,
+      "practicalTask": "Build a component fetching live search results with AbortController in useEffect cleanup.",
+      "subtopics": [
+        {
+          "id": "sub_fiber_reconciliation",
+          "name": "Fiber Nodes & Reconciliation",
+          "description": "Render phase vs Commit phase.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de12140275"
+        },
+        {
+          "id": "sub_hook_rules_mechanics",
+          "name": "Hooks Linked List & Call Order",
+          "description": "Why conditional hooks corrupt state alignment.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de12140276"
+        },
+        {
+          "id": "sub_effect_cleanup",
+          "name": "Effect Cleanup & Race Conditions",
+          "description": "Preventing memory leaks and stale state overwrites.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de12140277"
+        }
+      ],
+      "title": "React Hooks Internals & Render Lifecycle",
+      "type": "topic",
+      "week": 1,
+      "whatYouWillLearn": [
+        "React reconciliation: Virtual DOM diffing and Fiber trees",
+        "Why hooks must not be placed inside loops or conditions (Hook Call Order)",
+        "useState batching in React 18+ and functional state updates",
+        "useEffect cleanup functions and dependency array equality"
+      ]
+    },
+    {
+      "_id": "6afa1d099a6fc7a24c487cf3",
+      "itemId": "p1_w1_d3_dsa_two_pointers",
+      "__v": 0,
+      "category": "dsa",
+      "day": 3,
+      "description": "Learn the two-pointer technique for in-place array manipulation without allocating extra memory.",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 50,
+      "expectedOutcome": "Both problems solved with O(1) auxiliary space and clean pointer bounds.",
+      "learningObjectives": [
+        "Solve \"Remove Duplicates from Sorted Array\" in O(n) time and O(1) space",
+        "Solve \"Container With Most Water\" using two pointers"
+      ],
+      "order": 2,
+      "phase": 1,
+      "practicalTask": "Write C++ solutions for \"Remove Duplicates\" and \"Container With Most Water\".",
+      "subtopics": [
+        {
+          "id": "sub_opposite_pointers",
+          "name": "Opposite Direction Two Pointers",
+          "description": "Left and right pointers closing in based on greedy conditions.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de1214027b"
+        },
+        {
+          "id": "sub_slow_fast_pointers",
+          "name": "Slow & Fast Pointers",
+          "description": "Writing valid elements to the slow pointer position.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de1214027c"
+        },
+        {
+          "id": "sub_container_water",
+          "name": "Container With Most Water Logic",
+          "description": "Why moving the shorter bar is the only move that can increase area.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de1214027d"
+        }
+      ],
+      "title": "Two Pointers Technique & In-Place Modification",
+      "type": "topic",
+      "week": 1,
+      "whatYouWillLearn": [
+        "Opposite-direction pointers (e.g. palindrome check, two-sum on sorted array)",
+        "Same-direction slow/fast pointers (e.g. remove duplicates in-place)",
+        "Space complexity reduction from O(n) to O(1)"
+      ]
+    },
+    {
+      "_id": "6afa1d099a6fc7a24c487cf4",
+      "itemId": "p1_w1_d7_checkpoint",
+      "__v": 0,
+      "category": "dsa",
+      "day": 7,
+      "description": "Comprehensive review and independent assessment testing Week 1 mastery: closures, execution context, Two Sum, and Two Pointers.",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 60,
+      "expectedOutcome": "Demonstrated mastery of Week 1 curriculum with zero syntax assistance.",
+      "learningObjectives": [
+        "Solve 2 mixed algorithmic problems without looking at hints",
+        "Write an architectural explanation of closures and event loop"
+      ],
+      "order": 1,
+      "phase": 1,
+      "practicalTask": "Complete both challenges independently and document your reasoning in personal notes.",
+      "subtopics": [
+        {
+          "id": "sub_chk_dsa_assessment",
+          "name": "DSA Assessment: 2 Mixed Problems",
+          "description": "Solve 1 array hashing and 1 two-pointer problem.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de12140281"
+        },
+        {
+          "id": "sub_chk_reasoning",
+          "name": "Architectural Defense Note",
+          "description": "Explain why closures retain variables in heap and when garbage collection sweeps them.",
+          "isMandatory": true,
+          "_id": "6afa22aa284f30de12140282"
+        }
+      ],
+      "title": "Weekly Checkpoint 1: JavaScript Engine & Two Pointers Defense",
+      "type": "checkpoint",
+      "week": 1,
+      "whatYouWillLearn": [
+        "Synthesizing Week 1 concepts under timed pressure",
+        "Explaining time/space trade-offs verbally and in writing"
+      ]
+    }
+  ],
+  "milestones": [
+    {
+      "_id": "6afa31269a6fc7a24c488aa9",
+      "milestoneId": "M01",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "Complete the initial diagnostic and document gaps.",
+        "Write small JavaScript and C++ programs independently.",
+        "Explain the complexity of a simple traversal, nested loop and search.",
+        "Use Git branches and meaningful commits."
+      ],
+      "completedDate": null,
+      "description": "Demonstrate working JavaScript fundamentals, a reliable C++ setup and basic complexity reasoning.",
+      "journeyDay": 28,
+      "notes": "",
+      "order": 1,
+      "phase": 1,
+      "projectId": null,
+      "status": "current",
+      "tagline": "You can reason about code, not just run it.",
+      "targetDate": "2026-12-13",
+      "targetWeek": 4,
+      "technologies": [
+        "JavaScript",
+        "C++",
+        "Git"
+      ],
+      "title": "Programming baseline validated",
+      "topicsCovered": [
+        "JavaScript values, control flow and functions",
+        "C++ toolchain, STL and references",
+        "Big-O and array traversal",
+        "Input validation and edge cases"
+      ]
+    },
+    {
+      "_id": "6afa31269a6fc7a24c488aaa",
+      "milestoneId": "M02",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "Build a browser utility with dynamic DOM interactions and persistence.",
+        "Handle API loading, failure, timeout and cancellation.",
+        "Explain one event-loop output trace and one closure example.",
+        "Use TypeScript types for data boundaries."
+      ],
+      "completedDate": null,
+      "description": "Build browser features using DOM events, storage, async APIs and TypeScript foundations.",
+      "journeyDay": 56,
+      "notes": "",
+      "order": 2,
+      "phase": 1,
+      "projectId": null,
+      "status": "upcoming",
+      "tagline": "You understand the browser runtime and asynchronous code.",
+      "targetDate": "2027-01-10",
+      "targetWeek": 8,
+      "technologies": [
+        "JavaScript",
+        "DOM",
+        "Fetch API",
+        "TypeScript"
+      ],
+      "title": "Browser-side JavaScript engineer",
+      "topicsCovered": [
+        "Scope, closures, this and prototypes",
+        "Promises, async/await and event loop",
+        "DOM, event delegation and browser storage",
+        "TypeScript types and runtime validation"
+      ]
+    },
+    {
+      "_id": "6afa31269a6fc7a24c488aab",
+      "milestoneId": "M03",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "Deploy the API Explorer with list/detail routes.",
+        "Support loading, empty, error, search and filter states.",
+        "Pass build, typecheck, lint and critical component tests.",
+        "Solve unseen foundational DSA problems and explain complexity."
+      ],
+      "completedDate": null,
+      "description": "Ship a polished multi-route React/TypeScript application and demonstrate foundational DSA.",
+      "journeyDay": 91,
+      "notes": "",
+      "order": 3,
+      "phase": 1,
+      "projectId": "P02",
+      "status": "upcoming",
+      "tagline": "A deployed interface with maintainable state and tests.",
+      "targetDate": "2027-02-14",
+      "targetWeek": 13,
+      "technologies": [
+        "React",
+        "TypeScript",
+        "Vite",
+        "Tailwind CSS",
+        "Vitest"
+      ],
+      "title": "Frontend engineer: React + TypeScript release",
+      "topicsCovered": [
+        "Component architecture and state",
+        "Hooks, forms and API integration",
+        "Routing, accessibility and responsive UI",
+        "Frontend testing and performance",
+        "Arrays, strings, hashing, search, trees and graph fundamentals"
+      ]
+    },
+    {
+      "_id": "6afa31269a6fc7a24c488aac",
+      "milestoneId": "M04",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "Explain the Node request/event-loop model.",
+        "Implement controllers that delegate business rules to services.",
+        "Enforce user ownership and validate all inputs.",
+        "Demonstrate persistent add/update/remove cart operations."
+      ],
+      "completedDate": null,
+      "description": "Build secure API boundaries, intentional data models and the first complete cart flow.",
+      "journeyDay": 140,
+      "notes": "",
+      "order": 4,
+      "phase": 2,
+      "projectId": "P03",
+      "status": "upcoming",
+      "tagline": "You can design and implement backend business logic.",
+      "targetDate": "2027-04-04",
+      "targetWeek": 20,
+      "technologies": [
+        "Node.js",
+        "Express.js",
+        "MongoDB",
+        "Mongoose"
+      ],
+      "title": "Backend foundations: Node, Express and MongoDB",
+      "topicsCovered": [
+        "Node runtime and async I/O",
+        "Express routing, middleware and error handling",
+        "REST design and validation",
+        "MongoDB modelling, indexes and aggregation",
+        "Authentication, sessions and authorisation",
+        "Cart invariants and controller logic"
+      ]
+    },
+    {
+      "_id": "6afa31269a6fc7a24c488aad",
+      "milestoneId": "M05",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "A user can browse products, log in, manage a persistent cart and create an order.",
+        "Server-side logic recalculates prices and validates stock.",
+        "Duplicate checkout and invalid quantities are handled safely.",
+        "Critical routes have automated tests and a documented API."
+      ],
+      "completedDate": null,
+      "description": "Finish the existing e-commerce project instead of abandoning it for another tutorial.",
+      "journeyDay": 182,
+      "notes": "",
+      "order": 5,
+      "phase": 2,
+      "projectId": "P03",
+      "status": "upcoming",
+      "tagline": "A complete product, cart and order journey.",
+      "targetDate": "2027-05-16",
+      "targetWeek": 26,
+      "technologies": [
+        "React",
+        "Node.js",
+        "Express",
+        "MongoDB",
+        "PostgreSQL fundamentals",
+        "REST"
+      ],
+      "title": "Full-stack E-commerce V1",
+      "topicsCovered": [
+        "Product browsing and details",
+        "Authentication and protected routes",
+        "Persistent cart and server-side totals",
+        "Checkout simulation and order history",
+        "Inventory consistency and transactions",
+        "Testing, API docs and deployment"
+      ]
+    },
+    {
+      "_id": "6afa31279a6fc7a24c488aae",
+      "milestoneId": "M06",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "A backend feature is fully typed and runtime-validated.",
+        "Critical business rules and API flows are tested.",
+        "Redis-backed caching or rate limiting works and is measured.",
+        "A background job retries safely without duplicate side effects."
+      ],
+      "completedDate": null,
+      "description": "Use TypeScript, automated tests, Redis, rate limits and background jobs in one real service.",
+      "journeyDay": 217,
+      "notes": "",
+      "order": 6,
+      "phase": 3,
+      "projectId": "P04",
+      "status": "upcoming",
+      "tagline": "Your API handles shared state and asynchronous work.",
+      "targetDate": "2027-06-20",
+      "targetWeek": 31,
+      "technologies": [
+        "TypeScript",
+        "Redis",
+        "BullMQ or equivalent",
+        "Vitest/Jest",
+        "Supertest"
+      ],
+      "title": "Reliable backend primitives",
+      "topicsCovered": [
+        "Strict backend typing",
+        "Unit, integration and E2E testing",
+        "Redis data structures and cache invalidation",
+        "Atomic counters and rate limits",
+        "Idempotency and background queues"
+      ]
+    },
+    {
+      "_id": "6afa31279a6fc7a24c488aaf",
+      "milestoneId": "M07",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "The service runs from a reproducible Docker Compose setup.",
+        "CI runs lint, typecheck, tests and build.",
+        "Redis and queue features have failure-path tests.",
+        "One performance improvement is measured before and after.",
+        "Advanced DSA implementations are explained and tested."
+      ],
+      "completedDate": null,
+      "description": "Harden the e-commerce backend with Docker, CI, performance measurements and advanced DSA.",
+      "journeyDay": 273,
+      "notes": "",
+      "order": 7,
+      "phase": 3,
+      "projectId": "P04",
+      "status": "upcoming",
+      "tagline": "Build, test, containerise and observe your service.",
+      "targetDate": "2027-08-15",
+      "targetWeek": 39,
+      "technologies": [
+        "Node.js",
+        "TypeScript",
+        "Redis",
+        "Docker",
+        "Docker Compose",
+        "GitHub Actions"
+      ],
+      "title": "Production-oriented backend V2",
+      "topicsCovered": [
+        "Container images and networking",
+        "CI quality gates",
+        "Logs, metrics and profiling",
+        "Graph algorithms, DSU, MST and DP",
+        "Security and graceful shutdown"
+      ]
+    },
+    {
+      "_id": "6afa31279a6fc7a24c488ab1",
+      "milestoneId": "M08",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "Build a tested Java domain model with clear invariants.",
+        "Choose collections based on access patterns.",
+        "Demonstrate and fix a race condition.",
+        "Explain one meaningful design trade-off."
+      ],
+      "completedDate": null,
+      "description": "Demonstrate Java language fluency, composition, interfaces, collections and concurrency basics.",
+      "journeyDay": 301,
+      "notes": "",
+      "order": 8,
+      "phase": 4,
+      "projectId": "P05",
+      "status": "upcoming",
+      "tagline": "You can model domain behaviour in Java.",
+      "targetDate": "2027-09-12",
+      "targetWeek": 43,
+      "technologies": [
+        "Java",
+        "JVM",
+        "Collections",
+        "Concurrency"
+      ],
+      "title": "Java and object-oriented design",
+      "topicsCovered": [
+        "Java syntax and runtime",
+        "Encapsulation, polymorphism and composition",
+        "SOLID and dependency inversion",
+        "Collections, generics and streams",
+        "JVM memory and concurrency"
+      ]
+    },
+    {
+      "_id": "6afa31279a6fc7a24c488ab2",
+      "milestoneId": "M09",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "CRUD endpoints use DTOs and service boundaries.",
+        "Database relations and transactions behave correctly.",
+        "Validation and consistent errors are implemented.",
+        "Authentication and resource permissions are tested."
+      ],
+      "completedDate": null,
+      "description": "Implement Spring Boot REST endpoints backed by PostgreSQL and JPA.",
+      "journeyDay": 322,
+      "notes": "",
+      "order": 9,
+      "phase": 4,
+      "projectId": "P05",
+      "status": "upcoming",
+      "tagline": "A relational backend with tests and access control.",
+      "targetDate": "2027-10-03",
+      "targetWeek": 46,
+      "technologies": [
+        "Spring Boot",
+        "Spring MVC",
+        "Spring Data JPA",
+        "PostgreSQL",
+        "Spring Security"
+      ],
+      "title": "Secure Spring Boot API",
+      "topicsCovered": [
+        "Layered REST service",
+        "JPA entities and relationships",
+        "Transactions and locking",
+        "Validation and error mapping",
+        "Authentication/authorisation and tests"
+      ]
+    },
+    {
+      "_id": "6afa31279a6fc7a24c488ab3",
+      "milestoneId": "M10",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "Release a documented Spring Boot inventory/order service.",
+        "Present one-page architecture and API diagrams.",
+        "Explain database, caching and messaging trade-offs.",
+        "Demonstrate one timeout/retry or idempotency behaviour.",
+        "Complete a system-design walkthrough."
+      ],
+      "completedDate": null,
+      "description": "Release an Inventory and Order Management API with explicit system-design trade-offs.",
+      "journeyDay": 364,
+      "notes": "",
+      "order": 10,
+      "phase": 4,
+      "projectId": "P05",
+      "status": "upcoming",
+      "tagline": "You can explain how your service behaves under load and failure.",
+      "targetDate": "2027-11-14",
+      "targetWeek": 52,
+      "technologies": [
+        "Spring Boot",
+        "PostgreSQL",
+        "System Design",
+        "Distributed Systems"
+      ],
+      "title": "System design and Spring service capstone",
+      "topicsCovered": [
+        "Requirements and capacity estimates",
+        "Scaling, caching and load balancing",
+        "Replication, partitioning and consistency",
+        "Messaging, retries and idempotency",
+        "Timeouts, circuit breakers and graceful degradation"
+      ]
+    },
+    {
+      "_id": "6afa31279a6fc7a24c488ab4",
+      "milestoneId": "M11",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "Use shell tools to inspect processes, logs and permissions.",
+        "Explain binary representation, CPU execution and cache locality.",
+        "Explain virtual memory, scheduling and concurrency.",
+        "Trace DNS, TCP and HTTPS at a high level."
+      ],
+      "completedDate": null,
+      "description": "Connect Linux operations, computer architecture, OS concepts and network protocols to application behaviour.",
+      "journeyDay": 399,
+      "notes": "",
+      "order": 11,
+      "phase": 5,
+      "projectId": null,
+      "status": "upcoming",
+      "tagline": "You understand what happens below the API.",
+      "targetDate": "2027-12-19",
+      "targetWeek": 57,
+      "technologies": [
+        "Linux",
+        "Operating Systems",
+        "Computer Architecture",
+        "Computer Networks"
+      ],
+      "title": "Core systems and networking foundation",
+      "topicsCovered": [
+        "Shell, filesystem and permissions",
+        "Binary data and CPU execution",
+        "Processes, threads, memory and scheduling",
+        "TCP/IP, routing, DNS and HTTP",
+        "TLS and secure transport"
+      ]
+    },
+    {
+      "_id": "6afa31279a6fc7a24c488ab5",
+      "milestoneId": "M12",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "Deploy a versioned container image in a budget-controlled environment.",
+        "Keep the database private and credentials outside the repository.",
+        "Document health checks, logs, backups and teardown.",
+        "Recreate the deployment from written instructions."
+      ],
+      "completedDate": null,
+      "description": "Deploy a service with a clear network, identity, storage and database plan.",
+      "journeyDay": 427,
+      "notes": "",
+      "order": 12,
+      "phase": 5,
+      "projectId": "P06",
+      "status": "upcoming",
+      "tagline": "You can deploy a containerised service with secure cloud boundaries.",
+      "targetDate": "2028-01-16",
+      "targetWeek": 61,
+      "technologies": [
+        "AWS IAM",
+        "VPC",
+        "EC2 or equivalent",
+        "S3",
+        "RDS",
+        "Docker",
+        "Terraform basics"
+      ],
+      "title": "Cloud-deployed application",
+      "topicsCovered": [
+        "Least-privilege IAM",
+        "Public/private subnet model",
+        "Compute and reverse proxy",
+        "Object storage and managed database",
+        "Secrets and backups",
+        "Repeatable deployment"
+      ]
+    },
+    {
+      "_id": "6afa31289a6fc7a24c488ab7",
+      "milestoneId": "M13",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "CI/CD gates a deployment on successful quality checks.",
+        "A local Kubernetes deployment can be rolled out and rolled back.",
+        "A producer/consumer demo handles retries and duplicate events.",
+        "The application has basic metrics/logs and a recovery runbook."
+      ],
+      "completedDate": null,
+      "description": "Demonstrate CI/CD, basic Kubernetes, Kafka concepts and observability without unnecessary complexity.",
+      "journeyDay": 455,
+      "notes": "",
+      "order": 13,
+      "phase": 5,
+      "projectId": "P06",
+      "status": "upcoming",
+      "tagline": "You can operate and recover a deployed application.",
+      "targetDate": "2028-02-13",
+      "targetWeek": 65,
+      "technologies": [
+        "GitHub Actions",
+        "Kubernetes",
+        "Kafka",
+        "Metrics",
+        "Logs",
+        "Tracing"
+      ],
+      "title": "DevOps and reliability capstone",
+      "topicsCovered": [
+        "Kubernetes pods, deployments and services",
+        "Probes, ingress and rollout/rollback",
+        "Kafka partitions and consumer groups",
+        "Logs, metrics, traces and SLOs",
+        "Incident response and backup recovery"
+      ]
+    },
+    {
+      "_id": "6afa31289a6fc7a24c488ab8",
+      "milestoneId": "M14",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "Build a reproducible dataset and training pipeline.",
+        "Compare multiple baselines using appropriate metrics.",
+        "Explain data leakage and overfitting.",
+        "Train and evaluate a small PyTorch model."
+      ],
+      "completedDate": null,
+      "description": "Build a leakage-safe, reproducible ML pipeline and a small neural network.",
+      "journeyDay": 490,
+      "notes": "",
+      "order": 14,
+      "phase": 6,
+      "projectId": "P07",
+      "status": "upcoming",
+      "tagline": "You can train and evaluate a model responsibly.",
+      "targetDate": "2028-03-19",
+      "targetWeek": 70,
+      "technologies": [
+        "Python",
+        "NumPy",
+        "Pandas",
+        "scikit-learn",
+        "PyTorch"
+      ],
+      "title": "Machine learning engineering foundation",
+      "topicsCovered": [
+        "Data preparation and EDA",
+        "Linear algebra and probability for ML",
+        "Regression and classification",
+        "Metrics, validation and feature engineering",
+        "Neural networks and backpropagation"
+      ]
+    },
+    {
+      "_id": "6afa31289a6fc7a24c488ab9",
+      "milestoneId": "M15",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "Run a local model through a documented API.",
+        "Ingest a curated document collection with source metadata.",
+        "Retrieve relevant chunks and produce source-linked answers.",
+        "Record latency and retrieval-quality measurements."
+      ],
+      "completedDate": null,
+      "description": "Run local models and construct vector retrieval and a basic cited RAG system.",
+      "journeyDay": 525,
+      "notes": "",
+      "order": 15,
+      "phase": 6,
+      "projectId": "P07",
+      "status": "upcoming",
+      "tagline": "You can build grounded answers from a document collection.",
+      "targetDate": "2028-04-23",
+      "targetWeek": 75,
+      "technologies": [
+        "Ollama",
+        "Embeddings",
+        "Vector Search",
+        "RAG"
+      ],
+      "title": "LLM retrieval engineer",
+      "topicsCovered": [
+        "Tokenisation and transformer attention",
+        "Local inference and quantisation",
+        "Vector similarity and metadata filters",
+        "Document ingestion and chunking",
+        "Cited generation and abstention"
+      ]
+    },
+    {
+      "_id": "6afa31289a6fc7a24c488aba",
+      "milestoneId": "M16",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "Deliver a working end-to-end AI application.",
+        "Evaluate on a curated test set with documented metrics.",
+        "Compare at least one baseline and one improved variant.",
+        "Include failure examples, limitations and setup instructions.",
+        "Publish a short technical report and demo."
+      ],
+      "completedDate": null,
+      "description": "Ship a RAG/agent application or approved research extension with reproducible evaluation.",
+      "journeyDay": 546,
+      "notes": "",
+      "order": 16,
+      "phase": 6,
+      "projectId": "P07",
+      "status": "upcoming",
+      "tagline": "You can design, evaluate and explain a complete AI system.",
+      "targetDate": "2028-05-14",
+      "targetWeek": 78,
+      "technologies": [
+        "Python",
+        "LLMs",
+        "RAG",
+        "Tool Calling",
+        "Evaluation"
+      ],
+      "title": "AI research capstone",
+      "topicsCovered": [
+        "Hybrid retrieval and reranking",
+        "Faithfulness and answer evaluation",
+        "Bounded tools and agent state",
+        "Ablation and reproducibility",
+        "Research writing and limitations"
+      ]
+    },
+    {
+      "_id": "6afa31289a6fc7a24c488abb",
+      "milestoneId": "M17",
+      "__v": 0,
+      "acceptanceCriteria": [
+        "Present three strongest projects with demos and READMEs.",
+        "Explain architecture, data model, testing and deployment choices.",
+        "Complete a final DSA/Core CS self-assessment.",
+        "Write a realistic next six-month learning and internship plan."
+      ],
+      "completedDate": null,
+      "description": "Final portfolio review on 15 May 2028, the 18-month anniversary of the journey start.",
+      "journeyDay": 547,
+      "notes": "",
+      "order": 17,
+      "phase": 6,
+      "projectId": null,
+      "status": "upcoming",
+      "tagline": "Show what you can build and explain independently.",
+      "targetDate": "2028-05-15",
+      "targetWeek": null,
+      "technologies": [
+        "Portfolio",
+        "Technical Communication",
+        "Interview Readiness"
+      ],
+      "title": "18-month engineering showcase",
+      "topicsCovered": [
+        "Flagship project demonstrations",
+        "Architecture and trade-off explanations",
+        "DSA/Core CS retrospective",
+        "Next 6-month specialisation plan"
+      ]
+    }
+  ],
+  "dailyplans": [
+    {
+      "_id": "6afa3125c2b8b4a5ed792d84",
+      "date": "2026-11-16",
+      "journeyDay": 1,
+      "phase": 1,
+      "week": 1,
+      "assignedItems": [
+        {
+          "itemId": "day_1",
+          "title": "Engineering baseline and toolchain audit",
+          "type": "topic",
+          "category": "Engineering Foundations",
+          "description": "Practice: Complete a 60-minute diagnostic without tutorials. Record what you could solve independently and where you got stuck.",
+          "whatYouWillLearn": [
+            "Timed JavaScript task: manipulate an array of objects and render a result",
+            "Small C++ task: read input, process values and print output",
+            "Inspect Git workflow, VS Code/CLion setup, terminal and compiler versions"
+          ],
+          "learningObjectives": [
+            "Timed JavaScript task: manipulate an array of objects and render a result",
+            "Small C++ task: read input, process values and print output",
+            "Inspect Git workflow, VS Code/CLion setup, terminal and compiler versions"
+          ],
+          "subtopics": [
+            {
+              "id": "sub_1_1",
+              "name": "Timed JavaScript task: manipulate an array of objects and render a result",
+              "description": "",
+              "explanation": "",
+              "completed": false,
+              "_id": "6afa3125c2b8b4a5ed792d86"
+            },
+            {
+              "id": "sub_1_2",
+              "name": "Small C++ task: read input, process values and print output",
+              "description": "",
+              "explanation": "",
+              "completed": false,
+              "_id": "6afa3125c2b8b4a5ed792d87"
+            },
+            {
+              "id": "sub_1_3",
+              "name": "Inspect Git workflow, VS Code/CLion setup, terminal and compiler versions",
+              "description": "",
+              "explanation": "",
+              "completed": false,
+              "_id": "6afa3125c2b8b4a5ed792d88"
+            }
+          ],
+          "practicalTask": "Complete a 60-minute diagnostic without tutorials. Record what you could solve independently and where you got stuck.",
+          "expectedOutcome": "Supporting practice: 20–25 min DSA spaced recall: re-solve one previously learned problem without notes; write down the first point where reasoning became uncertain.",
+          "estimatedMinutes": 150,
+          "completed": false,
+          "progressPct": 0,
+          "notes": "",
+          "attachments": [],
+          "_id": "6afa3125c2b8b4a5ed792d85"
+        }
+      ],
+      "completionPercentage": 0,
+      "completed": false,
+      "createdAt": "2026-11-15T22:24:37.987Z",
+      "updatedAt": "2026-11-16T09:26:19.383Z",
+      "__v": 0
+    },
+    {
+      "_id": "6afacbc8284f30de12142a1e",
+      "date": "2026-11-17",
+      "journeyDay": 2,
+      "phase": 1,
+      "week": 1,
+      "assignedItems": [
+        {
+          "itemId": "p1_w1_d2_js_this_prototypes",
+          "title": "JavaScript \"this\", Prototypes & Inheritance",
+          "type": "topic",
+          "category": "javascript",
+          "description": "Demystify implicit, explicit (call, apply, bind), new, and lexical (arrow functions) binding of \"this\" alongside the prototype chain.",
+          "whatYouWillLearn": [
+            "The 4 binding rules of \"this\"",
+            "Arrow functions and lexical \"this\" inheritance",
+            "Prototype chain: Object.prototype, Function.prototype, __proto__ vs prototype",
+            "ES6 Class syntax desugared into prototypal inheritance"
+          ],
+          "learningObjectives": [
+            "Predict \"this\" binding in asynchronous callbacks and event handlers",
+            "Implement custom Function.prototype.myBind polyfill",
+            "Explain prototypal delegation in memory"
+          ],
+          "subtopics": [
+            {
+              "id": "sub_this_rules",
+              "name": "The 4 Binding Rules of \"this\"",
+              "description": "Default, implicit, explicit, and new keyword precedence.",
+              "completed": false,
+              "_id": "6afacbc8284f30de12142a20"
+            },
+            {
+              "id": "sub_arrow_this",
+              "name": "Arrow Functions & Lexical Binding",
+              "description": "Why arrow functions do not have their own this or arguments.",
+              "completed": false,
+              "_id": "6afacbc8284f30de12142a21"
+            },
+            {
+              "id": "sub_proto_chain",
+              "name": "Prototype Chain & Method Delegation",
+              "description": "How property lookups traverse up to Object.prototype.",
+              "completed": false,
+              "_id": "6afacbc8284f30de12142a22"
+            }
+          ],
+          "practicalTask": "Write a polyfill for Function.prototype.bind and test with context loss scenarios in setTimeout.",
+          "expectedOutcome": "A polyfill passing edge cases with partially applied arguments.",
+          "estimatedMinutes": 50,
+          "completed": false,
+          "progressPct": 0,
+          "notes": "",
+          "attachments": [],
+          "_id": "6afacbc8284f30de12142a1f"
+        },
+        {
+          "itemId": "p1_w1_d2_dsa_hashing",
+          "title": "Hashing Fundamentals & Two Sum in C++",
+          "type": "topic",
+          "category": "dsa",
+          "description": "Learn hash tables, collision resolution (chaining vs open addressing), and std::unordered_map in C++ for O(1) lookups.",
+          "whatYouWillLearn": [
+            "Hash functions, buckets, and load factor",
+            "std::unordered_map vs std::map (O(1) average hash vs O(log n) Red-Black Tree)",
+            "Two-Sum problem: Brute force O(n^2) to Hash Map O(n)"
+          ],
+          "learningObjectives": [
+            "Implement Two Sum in C++ in O(n) time and O(n) space",
+            "Explain hash collisions and worst-case O(n) behavior"
+          ],
+          "subtopics": [
+            {
+              "id": "sub_hash_theory",
+              "name": "Hash Function & Collision Resolution",
+              "description": "Separate chaining vs Linear Probing.",
+              "completed": false,
+              "_id": "6afacbc8284f30de12142a24"
+            },
+            {
+              "id": "sub_cpp_unordered_map",
+              "name": "std::unordered_map in C++",
+              "description": "Key hashing, insertion, find(), and count() methods.",
+              "completed": false,
+              "_id": "6afacbc8284f30de12142a25"
+            },
+            {
+              "id": "sub_two_sum_impl",
+              "name": "Two Sum Problem Implementation",
+              "description": "Single-pass hash map check for target - current.",
+              "completed": false,
+              "_id": "6afacbc8284f30de12142a26"
+            }
+          ],
+          "practicalTask": "Solve Two Sum on LeetCode using std::unordered_map in a single pass.",
+          "expectedOutcome": "Submitted and accepted C++ solution with 0ms or optimal runtime.",
+          "estimatedMinutes": 45,
+          "completed": false,
+          "progressPct": 0,
+          "notes": "",
+          "attachments": [],
+          "_id": "6afacbc8284f30de12142a23"
+        }
+      ],
+      "completionPercentage": 0,
+      "completed": false,
+      "createdAt": "2026-11-16T09:24:24.576Z",
+      "updatedAt": "2026-11-16T09:24:24.576Z",
+      "__v": 0
+    },
+    {
+      "_id": "6afacbca284f30de12142a39",
+      "date": "2026-11-18",
+      "journeyDay": 3,
+      "phase": 1,
+      "week": 1,
+      "assignedItems": [
+        {
+          "itemId": "p1_w1_d3_react_hooks",
+          "title": "React Hooks Internals & Render Lifecycle",
+          "type": "topic",
+          "category": "react",
+          "description": "Understand how React manages state across renders using fiber nodes and hook linked lists. Avoid state mutation bugs.",
+          "whatYouWillLearn": [
+            "React reconciliation: Virtual DOM diffing and Fiber trees",
+            "Why hooks must not be placed inside loops or conditions (Hook Call Order)",
+            "useState batching in React 18+ and functional state updates",
+            "useEffect cleanup functions and dependency array equality"
+          ],
+          "learningObjectives": [
+            "Explain how React pairs state with fiber nodes via index tracking",
+            "Write reliable useEffect cleanup for event listeners and abort controllers"
+          ],
+          "subtopics": [
+            {
+              "id": "sub_fiber_reconciliation",
+              "name": "Fiber Nodes & Reconciliation",
+              "description": "Render phase vs Commit phase.",
+              "completed": false,
+              "_id": "6afacbca284f30de12142a3b"
+            },
+            {
+              "id": "sub_hook_rules_mechanics",
+              "name": "Hooks Linked List & Call Order",
+              "description": "Why conditional hooks corrupt state alignment.",
+              "completed": false,
+              "_id": "6afacbca284f30de12142a3c"
+            },
+            {
+              "id": "sub_effect_cleanup",
+              "name": "Effect Cleanup & Race Conditions",
+              "description": "Preventing memory leaks and stale state overwrites.",
+              "completed": false,
+              "_id": "6afacbca284f30de12142a3d"
+            }
+          ],
+          "practicalTask": "Build a component fetching live search results with AbortController in useEffect cleanup.",
+          "expectedOutcome": "No memory leak warnings or race conditions when typing rapidly.",
+          "estimatedMinutes": 55,
+          "completed": false,
+          "progressPct": 0,
+          "notes": "",
+          "attachments": [],
+          "_id": "6afacbca284f30de12142a3a"
+        },
+        {
+          "itemId": "p1_w1_d3_dsa_two_pointers",
+          "title": "Two Pointers Technique & In-Place Modification",
+          "type": "topic",
+          "category": "dsa",
+          "description": "Learn the two-pointer technique for in-place array manipulation without allocating extra memory.",
+          "whatYouWillLearn": [
+            "Opposite-direction pointers (e.g. palindrome check, two-sum on sorted array)",
+            "Same-direction slow/fast pointers (e.g. remove duplicates in-place)",
+            "Space complexity reduction from O(n) to O(1)"
+          ],
+          "learningObjectives": [
+            "Solve \"Remove Duplicates from Sorted Array\" in O(n) time and O(1) space",
+            "Solve \"Container With Most Water\" using two pointers"
+          ],
+          "subtopics": [
+            {
+              "id": "sub_opposite_pointers",
+              "name": "Opposite Direction Two Pointers",
+              "description": "Left and right pointers closing in based on greedy conditions.",
+              "completed": false,
+              "_id": "6afacbca284f30de12142a3f"
+            },
+            {
+              "id": "sub_slow_fast_pointers",
+              "name": "Slow & Fast Pointers",
+              "description": "Writing valid elements to the slow pointer position.",
+              "completed": false,
+              "_id": "6afacbca284f30de12142a40"
+            },
+            {
+              "id": "sub_container_water",
+              "name": "Container With Most Water Logic",
+              "description": "Why moving the shorter bar is the only move that can increase area.",
+              "completed": false,
+              "_id": "6afacbca284f30de12142a41"
+            }
+          ],
+          "practicalTask": "Write C++ solutions for \"Remove Duplicates\" and \"Container With Most Water\".",
+          "expectedOutcome": "Both problems solved with O(1) auxiliary space and clean pointer bounds.",
+          "estimatedMinutes": 50,
+          "completed": false,
+          "progressPct": 0,
+          "notes": "",
+          "attachments": [],
+          "_id": "6afacbca284f30de12142a3e"
+        }
+      ],
+      "completionPercentage": 0,
+      "completed": false,
+      "createdAt": "2026-11-16T09:24:26.743Z",
+      "updatedAt": "2026-11-16T09:24:26.743Z",
+      "__v": 0
+    },
+    {
+      "_id": "6afacbcc284f30de12142a49",
+      "date": "2026-11-19",
+      "journeyDay": 4,
+      "phase": 1,
+      "week": 1,
+      "assignedItems": [
+        {
+          "itemId": "p1_w1_d1_js_closures",
+          "title": "JavaScript Execution Context & Closures",
+          "type": "topic",
+          "category": "javascript",
+          "description": "Understand how lexical environments, execution contexts, and closures retain access to outer variables even after the outer function returns.",
+          "whatYouWillLearn": [
+            "Call stack, Global Execution Context, and Function Execution Contexts",
+            "Lexical scope and scope chain resolution in V8 engine",
+            "Closures in memory: [[Scopes]] internal slot",
+            "Common pitfalls: loop variable scoping (var vs let)",
+            "Practical closure patterns: data privacy, memoization, and factory functions"
+          ],
+          "learningObjectives": [
+            "Diagram the scope chain of nested functions",
+            "Implement a private counter module using closure",
+            "Write a generic memoization utility function using closures"
+          ],
+          "subtopics": [
+            {
+              "id": "sub_exec_context",
+              "name": "Execution Context & Call Stack",
+              "description": "Creation phase vs Execution phase; hoisting of var and function declarations.",
+              "explanation": "During creation phase, memory is allocated for variables and functions. Execution phase runs the code line-by-line.",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a4b"
+            },
+            {
+              "id": "sub_lexical_env",
+              "name": "Lexical Environment & Scope Chain",
+              "description": "How nested functions search outer environments for unresolved identifiers.",
+              "explanation": "Every execution context has a reference to its outer lexical environment, forming the scope chain.",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a4c"
+            },
+            {
+              "id": "sub_closure_mechanics",
+              "name": "Closure Mechanics & V8 Heap Retention",
+              "description": "Why variables survive when a function completes execution.",
+              "explanation": "If an inner function outlives its enclosing function (e.g., returned or passed as callback), the enclosed variables are preserved in heap memory.",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a4d"
+            },
+            {
+              "id": "sub_practical_memoize",
+              "name": "Practical Implementation: Memoize & Counter",
+              "description": "Build a private counter and a memoize wrapper.",
+              "explanation": "const memoize = fn => { const cache = {}; return (...args) => { const k = JSON.stringify(args); return cache[k] ??= fn(...args); }; };",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a4e"
+            }
+          ],
+          "practicalTask": "Write a custom memoization function in pure JS and verify that expensive computations run only once per input.",
+          "expectedOutcome": "A working script demonstrating closure encapsulation without global state leaks.",
+          "estimatedMinutes": 50,
+          "completed": false,
+          "progressPct": 0,
+          "notes": "",
+          "attachments": [],
+          "_id": "6afacbcc284f30de12142a4a"
+        },
+        {
+          "itemId": "p1_w1_d1_dsa_arrays",
+          "title": "C++ Array Traversal & Time Complexity",
+          "type": "topic",
+          "category": "dsa",
+          "description": "Master Big-O analysis and fundamental array traversal in C++ using both raw arrays and std::vector.",
+          "whatYouWillLearn": [
+            "Contiguous memory allocation and cache locality benefits of arrays",
+            "O(1) random access math: Base_Address + (Index * Element_Size)",
+            "Linear traversal and single-pass maximum/minimum algorithms",
+            "Finding second largest element in a single pass without sorting (O(n) time, O(1) space)"
+          ],
+          "learningObjectives": [
+            "Explain contiguous memory access advantages over linked structures",
+            "Write an optimal single-pass algorithm for 2nd largest element in C++",
+            "Benchmark vector vs array indexing in C++"
+          ],
+          "subtopics": [
+            {
+              "id": "sub_array_memory",
+              "name": "Array Memory Layout & Cache Locality",
+              "description": "How CPU L1/L2 caches leverage spatial locality with arrays.",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a50"
+            },
+            {
+              "id": "sub_linear_traversal",
+              "name": "Single-Pass Traversal & Second Largest",
+              "description": "Tracking max1 and max2 simultaneously without auxiliary sorting.",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a51"
+            },
+            {
+              "id": "sub_complexity_derivation",
+              "name": "Complexity Derivation: O(n) vs O(n log n)",
+              "description": "Why single-pass is mathematically optimal for unsorted inputs.",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a52"
+            }
+          ],
+          "practicalTask": "Implement findSecondLargest(const std::vector<int>& arr) in C++ handling duplicates and negative numbers.",
+          "expectedOutcome": "Clean C++ code that passes corner cases: all elements equal, array of size 2, negative numbers.",
+          "estimatedMinutes": 45,
+          "completed": false,
+          "progressPct": 0,
+          "notes": "",
+          "attachments": [],
+          "_id": "6afacbcc284f30de12142a4f"
+        }
+      ],
+      "completionPercentage": 0,
+      "completed": false,
+      "createdAt": "2026-11-16T09:24:28.095Z",
+      "updatedAt": "2026-11-16T09:24:28.095Z",
+      "__v": 0
+    },
+    {
+      "_id": "6afacbcc284f30de12142a76",
+      "date": "2026-11-20",
+      "journeyDay": 5,
+      "phase": 1,
+      "week": 1,
+      "assignedItems": [
+        {
+          "itemId": "p1_w1_d2_js_this_prototypes",
+          "title": "JavaScript \"this\", Prototypes & Inheritance",
+          "type": "topic",
+          "category": "javascript",
+          "description": "Demystify implicit, explicit (call, apply, bind), new, and lexical (arrow functions) binding of \"this\" alongside the prototype chain.",
+          "whatYouWillLearn": [
+            "The 4 binding rules of \"this\"",
+            "Arrow functions and lexical \"this\" inheritance",
+            "Prototype chain: Object.prototype, Function.prototype, __proto__ vs prototype",
+            "ES6 Class syntax desugared into prototypal inheritance"
+          ],
+          "learningObjectives": [
+            "Predict \"this\" binding in asynchronous callbacks and event handlers",
+            "Implement custom Function.prototype.myBind polyfill",
+            "Explain prototypal delegation in memory"
+          ],
+          "subtopics": [
+            {
+              "id": "sub_this_rules",
+              "name": "The 4 Binding Rules of \"this\"",
+              "description": "Default, implicit, explicit, and new keyword precedence.",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a78"
+            },
+            {
+              "id": "sub_arrow_this",
+              "name": "Arrow Functions & Lexical Binding",
+              "description": "Why arrow functions do not have their own this or arguments.",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a79"
+            },
+            {
+              "id": "sub_proto_chain",
+              "name": "Prototype Chain & Method Delegation",
+              "description": "How property lookups traverse up to Object.prototype.",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a7a"
+            }
+          ],
+          "practicalTask": "Write a polyfill for Function.prototype.bind and test with context loss scenarios in setTimeout.",
+          "expectedOutcome": "A polyfill passing edge cases with partially applied arguments.",
+          "estimatedMinutes": 50,
+          "completed": false,
+          "progressPct": 0,
+          "notes": "",
+          "attachments": [],
+          "_id": "6afacbcc284f30de12142a77"
+        },
+        {
+          "itemId": "p1_w1_d2_dsa_hashing",
+          "title": "Hashing Fundamentals & Two Sum in C++",
+          "type": "topic",
+          "category": "dsa",
+          "description": "Learn hash tables, collision resolution (chaining vs open addressing), and std::unordered_map in C++ for O(1) lookups.",
+          "whatYouWillLearn": [
+            "Hash functions, buckets, and load factor",
+            "std::unordered_map vs std::map (O(1) average hash vs O(log n) Red-Black Tree)",
+            "Two-Sum problem: Brute force O(n^2) to Hash Map O(n)"
+          ],
+          "learningObjectives": [
+            "Implement Two Sum in C++ in O(n) time and O(n) space",
+            "Explain hash collisions and worst-case O(n) behavior"
+          ],
+          "subtopics": [
+            {
+              "id": "sub_hash_theory",
+              "name": "Hash Function & Collision Resolution",
+              "description": "Separate chaining vs Linear Probing.",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a7c"
+            },
+            {
+              "id": "sub_cpp_unordered_map",
+              "name": "std::unordered_map in C++",
+              "description": "Key hashing, insertion, find(), and count() methods.",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a7d"
+            },
+            {
+              "id": "sub_two_sum_impl",
+              "name": "Two Sum Problem Implementation",
+              "description": "Single-pass hash map check for target - current.",
+              "completed": false,
+              "_id": "6afacbcc284f30de12142a7e"
+            }
+          ],
+          "practicalTask": "Solve Two Sum on LeetCode using std::unordered_map in a single pass.",
+          "expectedOutcome": "Submitted and accepted C++ solution with 0ms or optimal runtime.",
+          "estimatedMinutes": 45,
+          "completed": false,
+          "progressPct": 0,
+          "notes": "",
+          "attachments": [],
+          "_id": "6afacbcc284f30de12142a7b"
+        }
+      ],
+      "completionPercentage": 0,
+      "completed": false,
+      "createdAt": "2026-11-16T09:24:28.767Z",
+      "updatedAt": "2026-11-16T09:24:28.767Z",
+      "__v": 0
+    }
+  ],
+  "notifications": [
+    {
+      "_id": "6afa1d465be8cc0b3673509e",
+      "title": "Today's learning plan completed!",
+      "message": "Great work! All scheduled topics have been completed.",
+      "date": "2026-11-16",
+      "read": true,
+      "type": "completion",
+      "createdAt": "2026-11-15T20:59:50.706Z",
+      "__v": 0
+    },
+    {
+      "_id": "6afa2f9c284f30de121425e7",
+      "title": "Today's learning plan completed!",
+      "message": "Great work! All scheduled topics have been completed.",
+      "date": "2026-11-16",
+      "read": false,
+      "type": "completion",
+      "createdAt": "2026-11-15T22:18:04.896Z",
+      "__v": 0
+    }
+  ]
+}

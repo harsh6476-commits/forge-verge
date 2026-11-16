@@ -1,4 +1,11 @@
-import { DailyPlan, Milestone, ProgressSummary, AppNotification } from '../types/api';
+import {
+  DailyPlan,
+  Milestone,
+  ProgressSummary,
+  AppNotification,
+  CurriculumListResponse,
+  CurriculumItemDetail,
+} from '../types/api';
 
 const API_BASE = '/api';
 
@@ -20,7 +27,9 @@ async function fetchJson<T>(url: string, options: RequestInit = {}): Promise<T> 
     } catch {
       // fallback
     }
-    throw new Error(errMessage);
+    const error = new Error(errMessage) as Error & { status: number };
+    error.status = res.status;
+    throw error;
   }
 
   return res.json();
@@ -87,18 +96,39 @@ export const api = {
     return fetchJson('/milestones');
   },
 
-  async updateMilestoneCompletion(id: string, completed: boolean): Promise<Milestone[]> {
-    return fetchJson(`/milestones/${id}/completion`, {
-      method: 'PATCH',
-      body: JSON.stringify({ completed }),
-    });
-  },
-
   async updateMilestoneNotes(id: string, notes: string): Promise<Milestone> {
     return fetchJson(`/milestones/${id}/notes`, {
       method: 'PUT',
       body: JSON.stringify({ notes }),
     });
+  },
+
+  // Curriculum Catalog
+  async getCurriculumList(params: {
+    phase?: number;
+    week?: number;
+    category?: string;
+    kind?: string;
+    status?: string;
+    q?: string;
+    cursor?: number;
+    limit?: number;
+  } = {}): Promise<CurriculumListResponse> {
+    const qs = new URLSearchParams();
+    if (params.phase != null) qs.set('phase', String(params.phase));
+    if (params.week != null) qs.set('week', String(params.week));
+    if (params.category) qs.set('category', params.category);
+    if (params.kind) qs.set('kind', params.kind);
+    if (params.status) qs.set('status', params.status);
+    if (params.q) qs.set('q', params.q);
+    if (params.cursor != null) qs.set('cursor', String(params.cursor));
+    if (params.limit != null) qs.set('limit', String(params.limit));
+    const query = qs.toString();
+    return fetchJson(`/curriculum${query ? `?${query}` : ''}`);
+  },
+
+  async getCurriculumItemDetails(itemId: string): Promise<CurriculumItemDetail> {
+    return fetchJson(`/curriculum/${encodeURIComponent(itemId)}`);
   },
 
   // Attachments

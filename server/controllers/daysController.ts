@@ -1,13 +1,17 @@
 import { Request, Response } from 'express';
 import DailyPlan from '../models/DailyPlan.js';
 import Notification from '../models/Notification.js';
-import { getOrCreateDailyPlan } from '../services/curriculumService.js';
+import { getOrCreateDailyPlan, syncItemProgress } from '../services/curriculumService.js';
 import { formatISTDate, addDaysToDateStr } from '../../src/lib/date-utils.js';
 
 export async function getTodayPlan(_req: Request, res: Response): Promise<void> {
   const todayStr = formatISTDate();
   try {
     const plan = await getOrCreateDailyPlan(todayStr);
+    if (!plan) {
+      res.status(404).json({ error: `No scheduled curriculum for today (${todayStr})` });
+      return;
+    }
     res.json(plan);
   } catch (err: any) {
     res.status(500).json({ error: err.message || 'Error fetching today plan' });
@@ -18,6 +22,10 @@ export async function getPlanByDate(req: Request, res: Response): Promise<void> 
   const dateStr = (req.query.date as string) || req.params.date || formatISTDate();
   try {
     const plan = await getOrCreateDailyPlan(dateStr);
+    if (!plan) {
+      res.status(404).json({ error: `No scheduled curriculum for date (${dateStr})` });
+      return;
+    }
     res.json(plan);
   } catch (err: any) {
     res.status(500).json({ error: err.message || 'Error fetching plan for date' });
@@ -35,7 +43,7 @@ export async function updateItemCompletion(req: Request, res: Response): Promise
       return;
     }
 
-    const item = plan.assignedItems.find(i => i.itemId === itemId);
+    const item = plan.assignedItems.find((i: any) => i.itemId === itemId);
     if (!item) {
       res.status(404).json({ error: 'Item not found in daily plan' });
       return;
@@ -43,12 +51,19 @@ export async function updateItemCompletion(req: Request, res: Response): Promise
 
     item.completed = completed;
     item.progressPct = completed ? 100 : 0;
-    item.subtopics.forEach(s => {
+    item.subtopics.forEach((s: any) => {
       s.completed = completed;
     });
 
     recalculatePlanProgress(plan);
     await plan.save();
+
+    // Sync canonical CurriculumProgress and recalculate milestone progress
+    const completedSubtopicIds = item.subtopics
+      .filter((s: any) => s.completed)
+      .map((s: any) => s.id);
+
+    await syncItemProgress(item.itemId, completed, completedSubtopicIds, item.notes);
 
     res.json({ plan, item });
   } catch (err: any) {
@@ -67,13 +82,13 @@ export async function updateSubtopicCompletion(req: Request, res: Response): Pro
       return;
     }
 
-    const item = plan.assignedItems.find(i => i.itemId === itemId);
+    const item = plan.assignedItems.find((i: any) => i.itemId === itemId);
     if (!item) {
       res.status(404).json({ error: 'Item not found in daily plan' });
       return;
     }
 
-    const subtopic = item.subtopics.find(s => s.id === subtopicId);
+    const subtopic = item.subtopics.find((s: any) => s.id === subtopicId);
     if (!subtopic) {
       res.status(404).json({ error: 'Subtopic not found' });
       return;
@@ -82,12 +97,19 @@ export async function updateSubtopicCompletion(req: Request, res: Response): Pro
     subtopic.completed = completed;
 
     const totalSubtopics = item.subtopics.length;
-    const completedSubtopics = item.subtopics.filter(s => s.completed).length;
+    const completedSubtopics = item.subtopics.filter((s: any) => s.completed).length;
     item.progressPct = totalSubtopics > 0 ? Math.round((completedSubtopics / totalSubtopics) * 100) : 100;
     item.completed = completedSubtopics === totalSubtopics && totalSubtopics > 0;
 
     recalculatePlanProgress(plan);
     await plan.save();
+
+    // Sync canonical progress
+    const completedSubtopicIds = item.subtopics
+      .filter((s: any) => s.completed)
+      .map((s: any) => s.id);
+
+    await syncItemProgress(item.itemId, item.completed, completedSubtopicIds, item.notes);
 
     res.json({ plan, item, subtopic });
   } catch (err: any) {
@@ -106,7 +128,7 @@ export async function updateItemNotes(req: Request, res: Response): Promise<void
       return;
     }
 
-    const item = plan.assignedItems.find(i => i.itemId === itemId);
+    const item = plan.assignedItems.find((i: any) => i.itemId === itemId);
     if (!item) {
       res.status(404).json({ error: 'Item not found in daily plan' });
       return;
@@ -116,40 +138,57 @@ export async function updateItemNotes(req: Request, res: Response): Promise<void
     plan.updatedAt = new Date();
     await plan.save();
 
+    const completedSubtopicIds = item.subtopics
+      .filter((s: any) => s.completed)
+      .map((s: any) => s.id);
+
+    await syncItemProgress(item.itemId, item.completed, completedSubtopicIds, item.notes);
+
     res.json({ success: true, notes: item.notes });
   } catch (err: any) {
     res.status(500).json({ error: err.message || 'Error updating notes' });
   }
 }
 
+/**
+ * Fast, bounded, indexed streak & summary calculation
+ */
 export async function getProgressSummary(_req: Request, res: Response): Promise<void> {
   try {
     const todayStr = formatISTDate();
-    const plans = await DailyPlan.find({}).sort({ date: -1 });
+    const todayPlan = await DailyPlan.findOne({ date: todayStr }).lean();
 
     let streak = 0;
     let checkDate = todayStr;
 
-    const todayPlan = plans.find(p => p.date === todayStr);
-    if (todayPlan && todayPlan.completed) {
-      streak += 1;
+    if (todayPlan && (todayPlan as any).completed) {
+      streak = 1;
       checkDate = addDaysToDateStr(todayStr, -1);
     } else {
       checkDate = addDaysToDateStr(todayStr, -1);
     }
 
-    while (true) {
-      const p = plans.find(plan => plan.date === checkDate);
-      if (p && p.completed) {
-        streak += 1;
-        checkDate = addDaysToDateStr(checkDate, -1);
-      } else {
-        break;
-      }
+    // Bounded indexed query for previous completed days (up to 365 days)
+    const pastCompleted = await DailyPlan.find({
+      date: { $lte: checkDate },
+      completed: true,
+    })
+      .sort({ date: -1 })
+      .limit(365)
+      .select('date completed')
+      .lean();
+
+    const completedSet = new Set(pastCompleted.map((p: any) => p.date));
+
+    while (completedSet.has(checkDate)) {
+      streak += 1;
+      checkDate = addDaysToDateStr(checkDate, -1);
     }
 
-    const totalDaysRecorded = plans.length;
-    const completedDaysCount = plans.filter(p => p.completed).length;
+    const [totalDaysRecorded, completedDaysCount] = await Promise.all([
+      DailyPlan.countDocuments(),
+      DailyPlan.countDocuments({ completed: true }),
+    ]);
 
     res.json({
       todayDate: todayStr,
@@ -163,12 +202,22 @@ export async function getProgressSummary(_req: Request, res: Response): Promise<
   }
 }
 
-export async function getProgressHistory(_req: Request, res: Response): Promise<void> {
+export async function getProgressHistory(req: Request, res: Response): Promise<void> {
   try {
-    const plans = await DailyPlan.find({})
+    const limit = Math.min(Math.max(Number(req.query.limit) || 30, 1), 60);
+    const beforeDate = req.query.before as string;
+
+    const query: any = {};
+    if (beforeDate) {
+      query.date = { $lt: beforeDate };
+    }
+
+    const plans = await DailyPlan.find(query)
       .select('date journeyDay completionPercentage completed assignedItems')
       .sort({ date: -1 })
-      .limit(60);
+      .limit(limit)
+      .lean();
+
     res.json(plans);
   } catch (err: any) {
     res.status(500).json({ error: err.message || 'Error fetching progress history' });

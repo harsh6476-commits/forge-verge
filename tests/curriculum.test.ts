@@ -15,6 +15,45 @@ describe('18-Month Curriculum Integrity & Ingestion', () => {
     expect(projectsMap.size).toBe(7);
   });
 
+  it('verifies exact counts of kinds: 390 topics, 79 checkpoints, 78 reviews', () => {
+    const { curriculumByItemId } = loadCurriculumData();
+    const items = Array.from(curriculumByItemId.values());
+    expect(items.length).toBe(547);
+
+    const counts: Record<string, number> = { topic: 0, checkpoint: 0, review: 0 };
+    for (const item of items) {
+      counts[item.kind] = (counts[item.kind] || 0) + 1;
+    }
+
+    expect(counts.topic).toBe(390);
+    expect(counts.checkpoint).toBe(79); // 78 weekly + 1 Day 547 final
+    expect(counts.review).toBe(78);
+  });
+
+  it('ensures all 547 items have unique itemIds and valid subtopic IDs', () => {
+    const { curriculumByItemId } = loadCurriculumData();
+    const items = Array.from(curriculumByItemId.values());
+    const itemIds = new Set<string>();
+    const subtopicIds = new Set<string>();
+
+    for (const item of items) {
+      expect(item.itemId).toBeDefined();
+      expect(itemIds.has(item.itemId)).toBe(false);
+      itemIds.add(item.itemId);
+
+      if (item.subtopicItems) {
+        for (const sub of item.subtopicItems) {
+          expect(sub.id).toBeDefined();
+          expect(subtopicIds.has(sub.id)).toBe(false);
+          subtopicIds.add(sub.id);
+        }
+      }
+    }
+
+    expect(itemIds.size).toBe(547);
+    expect(subtopicIds.size).toBeGreaterThan(1500);
+  });
+
   it('correctly maps Day 1 on 2026-11-16 to engineering baseline', () => {
     const { curriculumByDate } = loadCurriculumData();
     const day1 = curriculumByDate.get('2026-11-16');
@@ -54,11 +93,30 @@ describe('18-Month Curriculum Integrity & Ingestion', () => {
     expect(day7?.subtopics?.length).toBeGreaterThanOrEqual(4);
   });
 
-  it('validates 17 milestones metadata and acceptance criteria', () => {
+  it('validates 17 milestones partition all 547 requiredItemIds without overlaps or gaps', () => {
+    const { cachedMilestones } = loadCurriculumData();
+    expect(cachedMilestones.length).toBe(17);
+
+    const coveredItemIds = new Set<string>();
+
+    for (const m of cachedMilestones) {
+      expect(m.requiredItemIds).toBeDefined();
+      expect(m.requiredItemIds?.length).toBeGreaterThan(0);
+
+      for (const id of m.requiredItemIds!) {
+        expect(coveredItemIds.has(id)).toBe(false); // No overlap
+        coveredItemIds.add(id);
+      }
+    }
+
+    // Exactly all 547 items must be covered
+    expect(coveredItemIds.size).toBe(547);
+  });
+
+  it('validates milestone acceptance criteria and boundaries', () => {
     const { cachedMilestones } = loadCurriculumData();
 
     expect(cachedMilestones[0].milestoneId).toBe('M01');
-    expect(cachedMilestones[0].status).toBe('current');
     expect(cachedMilestones[0].acceptanceCriteria?.length).toBeGreaterThan(0);
 
     const m17 = cachedMilestones[16];
@@ -66,10 +124,12 @@ describe('18-Month Curriculum Integrity & Ingestion', () => {
     expect(m17.journeyDay).toBe(547);
     expect(m17.targetDate).toBe('2028-05-15');
 
-    // All milestones must have acceptance criteria
     for (const m of cachedMilestones) {
       expect(m.acceptanceCriteria).toBeDefined();
       expect(m.acceptanceCriteria?.length).toBeGreaterThan(0);
+      expect(m.startJourneyDay).toBeDefined();
+      expect(m.endJourneyDay).toBeDefined();
+      expect(m.startJourneyDay).toBeLessThanOrEqual(m.endJourneyDay!);
     }
   });
 });

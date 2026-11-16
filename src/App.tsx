@@ -1,11 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { api } from './services/api';
 import { PinGate } from './components/PinGate';
 import { TopNav } from './components/TopNav';
 import { TodayPage } from './pages/Today';
-import { MilestonesPage } from './pages/Milestones';
 import { AppNotification } from './types/api';
+
+const MilestonesPage = lazy(() => import('./pages/Milestones').then((m) => ({ default: m.MilestonesPage })));
+const TopicsPage = lazy(() => import('./pages/Topics').then((m) => ({ default: m.TopicsPage })));
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center h-[calc(100vh-4rem)] text-ink-muted font-mono text-xs tracking-widest uppercase gap-3">
+      <div className="animate-spin w-5 h-5 border-2 border-accent border-t-transparent rounded-full" />
+      Loading...
+    </div>
+  );
+}
 
 export function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -30,7 +41,7 @@ export function App() {
         api.getProgressSummary().catch(() => ({ streak: 0 })),
         api.getNotifications().catch(() => []),
       ]);
-      setStreak(sum.streak || 0);
+      setStreak((sum as any).streak || 0);
       setNotifications(notifs || []);
     } catch {
       // Fallback
@@ -60,7 +71,8 @@ export function App() {
 
   if (isAuthenticated === null) {
     return (
-      <div className="min-h-screen bg-canvas flex items-center justify-center text-black font-mono text-xs tracking-widest uppercase">
+      <div className="min-h-screen bg-canvas flex items-center justify-center text-surface font-mono text-xs tracking-widest uppercase gap-3">
+        <div className="animate-spin w-5 h-5 border-2 border-accent border-t-transparent rounded-full" />
         Initializing FORGE OS...
       </div>
     );
@@ -72,8 +84,7 @@ export function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-canvas text-black flex flex-col font-mono tracking-wide selection:bg-accent selection:text-highlight">
-        {/* Top Header Navigation */}
+      <div className="min-h-screen bg-canvas text-ink flex flex-col selection:bg-accent selection:text-white">
         <TopNav
           streak={streak}
           onLock={handleLock}
@@ -81,13 +92,15 @@ export function App() {
           onMarkRead={handleMarkNotificationRead}
         />
 
-        {/* 2 Main Pages: Today and Milestones */}
         <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<TodayPage />} />
-            <Route path="/milestones" element={<MilestonesPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<TodayPage />} />
+              <Route path="/topics" element={<TopicsPage />} />
+              <Route path="/milestones" element={<MilestonesPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
     </BrowserRouter>

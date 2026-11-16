@@ -25,6 +25,7 @@ export interface AssignedItem {
   learningObjectives: string[];
   subtopics: Subtopic[];
   practicalTask?: string;
+  supportingPractice?: string;
   expectedOutcome?: string;
   estimatedMinutes: number;
   completed: boolean;
@@ -52,6 +53,8 @@ export interface Milestone {
   phase: number;
   targetWeek: number | null;
   journeyDay: number;
+  startJourneyDay?: number;
+  endJourneyDay?: number;
   targetDate: string; // YYYY-MM-DD
   title: string;
   tagline: string;
@@ -59,6 +62,10 @@ export interface Milestone {
   technologies: string[];
   topicsCovered: string[];
   acceptanceCriteria: string[];
+  requiredItemIds?: string[];
+  requiredItemCount?: number;
+  completedItemCount?: number;
+  progressPct?: number;
   status: 'upcoming' | 'current' | 'completed';
   completedDate?: string | null;
   notes: string;
@@ -83,3 +90,62 @@ export interface AppNotification {
   createdAt: string;
 }
 
+// ─── Curriculum Catalog ───────────────────────────────────────────────────────
+
+export type CurriculumKind = 'topic' | 'checkpoint' | 'review';
+export type CurriculumStatus = 'not_started' | 'in_progress' | 'completed';
+
+export interface CurriculumCatalogItem {
+  _id?: string;
+  itemId: string;
+  journeyDay: number;
+  date: string; // YYYY-MM-DD
+  dayOfWeek?: number;
+  kind: CurriculumKind;
+  title: string;
+  category: string;
+  minutes: number;
+  phase: number;
+  globalWeek: number;
+  phaseWeek: number;
+  milestoneId: string;
+  subtopics?: string[];
+  subtopicItems?: Array<{ id: string; name: string; description?: string }>;
+  practice?: string;
+  supportingPractice?: string;
+  status: CurriculumStatus;
+  completed: boolean;
+  progressPct: number;
+  completedSubtopicIds?: string[];
+}
+
+export interface CurriculumItemDetail extends CurriculumCatalogItem {
+  description?: string;
+  whatYouWillLearn?: string[];
+  learningObjectives?: string[];
+  practicalTask?: string;
+  expectedOutcome?: string;
+  weekResearchCheckpoint?: { title: string; task: string; note?: string } | string | null;
+  notes?: string;
+  completedAt?: string | null;
+  linkedProject?: {
+    projectId: string;
+    title: string;
+    description: string;
+    technologies?: string[];
+  } | null;
+}
+
+export interface CurriculumListSummary {
+  totalItems: number;
+  completed: number;
+  inProgress: number;
+  notStarted: number;
+}
+
+export interface CurriculumListResponse {
+  items: CurriculumCatalogItem[];
+  nextCursor: number | null;
+  total: number;
+  summary: CurriculumListSummary;
+}

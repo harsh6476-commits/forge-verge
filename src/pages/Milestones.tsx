@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../services/api';
 import { Milestone } from '../types/api';
-import { CheckCircle2, Circle, Sparkles, Save, Calendar, CheckSquare, Layers } from 'lucide-react';
+import { CheckCircle2, Sparkles, Save, Calendar, CheckSquare, Layers, Lock } from 'lucide-react';
 import { clsx } from 'clsx';
 import { formatShortISTDate } from '../lib/date-utils';
 
@@ -24,7 +24,7 @@ export const MilestonesPage: React.FC = () => {
       setSelectedMilestone(current);
       setNotes(current?.notes || '');
     } catch (err) {
-      console.error(err);
+      console.error('Failed to load milestones:', err);
     } finally {
       setLoading(false);
     }
@@ -39,16 +39,6 @@ export const MilestonesPage: React.FC = () => {
       currentRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [loading]);
-
-  const handleToggleCompletion = async (m: Milestone) => {
-    const isCompleted = m.status === 'completed';
-    const updated = await api.updateMilestoneCompletion(m.milestoneId, !isCompleted);
-    setMilestones(updated);
-    const refreshed = updated.find((item) => item.milestoneId === m.milestoneId);
-    if (refreshed) {
-      setSelectedMilestone(refreshed);
-    }
-  };
 
   const handleSaveNotes = async () => {
     if (!selectedMilestone) return;
@@ -65,26 +55,26 @@ export const MilestonesPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-4rem)] text-black font-mono text-sm tracking-widest uppercase">
-        <div className="animate-spin mr-3 w-5 h-5 border-2 border-accent border-t-transparent rounded-full" />
+      <div className="flex items-center justify-center h-[calc(100vh-4rem)] text-surface font-mono text-sm tracking-widest uppercase gap-3">
+        <div className="animate-spin w-5 h-5 border-2 border-accent border-t-transparent rounded-full" />
         LOADING 18-MONTH MILESTONES...
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 sm:px-8 py-8 space-y-8 font-mono text-black">
+    <div className="max-w-6xl mx-auto px-6 sm:px-8 py-8 space-y-8 font-sans text-ink">
       {/* Header */}
-      <div className="text-center max-w-xl mx-auto space-y-3 bg-highlight border-2 border-zinc-200 rounded-3xl p-6 sm:p-8 shadow-crisp">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-accent text-highlight text-xs font-extrabold uppercase tracking-widest border border-zinc-200">
+      <div className="text-center max-w-xl mx-auto space-y-3 bg-surface border-2 border-border rounded-3xl p-6 sm:p-8 shadow-crisp">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-accent text-white text-xs font-mono font-extrabold uppercase tracking-widest border border-accent">
           <Sparkles className="w-4 h-4" />
           <span>18-Month Progression Path</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-wider uppercase">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase text-ink">
           Engineering Milestones
         </h1>
-        <p className="text-xs sm:text-sm text-black/85 leading-relaxed">
-          17 outcome-based checkpoints across 6 phases. Mark milestones complete as you master core concepts, build independent projects and validate real capabilities.
+        <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
+          17 outcome-based checkpoints across 6 phases. Milestones advance automatically as you complete daily topics and checkpoints in your curriculum.
         </p>
       </div>
 
@@ -92,7 +82,7 @@ export const MilestonesPage: React.FC = () => {
         {/* Left: Candy Crush Winding Progression Path (7 cols) */}
         <div className="lg:col-span-7 flex flex-col items-center py-6 relative">
           {/* Vertical Winding Path Line */}
-          <div className="absolute top-8 bottom-8 w-1.5 bg-black -z-0" />
+          <div className="absolute top-8 bottom-8 w-1.5 bg-border -z-0" />
 
           <div className="space-y-12 w-full max-w-md z-10">
             {milestones.map((m, index) => {
@@ -100,6 +90,9 @@ export const MilestonesPage: React.FC = () => {
               const isCurrent = m.status === 'current';
               const isCompleted = m.status === 'completed';
               const isSelected = selectedMilestone?.milestoneId === m.milestoneId;
+              const progressPct = m.progressPct || 0;
+              const reqCount = m.requiredItemCount ?? m.requiredItemIds?.length ?? 0;
+              const compCount = m.completedItemCount || 0;
 
               return (
                 <div
@@ -117,17 +110,17 @@ export const MilestonesPage: React.FC = () => {
                   {/* Milestone Card */}
                   <div
                     className={clsx(
-                      'flex-1 p-5 rounded-3xl border-2 transition-all text-xs space-y-1',
-                      isSelected ? 'ring-4 ring-black shadow-crisp-lg border-black' : 'border-zinc-200 shadow-crisp',
+                      'flex-1 p-5 rounded-3xl border-2 transition-all text-xs space-y-2',
+                      isSelected ? 'ring-2 ring-accent shadow-crisp-lg border-border' : 'border-border shadow-crisp',
                       isCompleted
-                        ? 'bg-canvas text-black'
+                        ? 'bg-surface text-ink'
                         : isCurrent
-                        ? 'bg-highlight border-black ring-2 ring-accent scale-105'
-                        : 'bg-highlight/70 text-black/75 hover:bg-highlight hover:border-black'
+                        ? 'bg-surface-bright border-focus ring-2 ring-focus shadow-crisp-lg scale-105'
+                        : 'bg-surface/90 text-ink-muted hover:bg-surface hover:text-ink'
                     )}
                   >
-                    <div className="flex items-center justify-between text-[11px] font-bold mb-1.5">
-                      <span className={clsx(isCompleted ? 'text-accent' : isCurrent ? 'text-black' : 'text-black/70')}>
+                    <div className="flex items-center justify-between text-[11px] font-mono font-bold mb-1">
+                      <span className={clsx(isCompleted ? 'text-accent' : isCurrent ? 'text-focus' : 'text-ink-muted')}>
                         PHASE {m.phase} · {m.milestoneId}
                       </span>
                       {isCompleted && (
@@ -136,18 +129,32 @@ export const MilestonesPage: React.FC = () => {
                         </span>
                       )}
                       {isCurrent && (
-                        <span className="bg-accent text-highlight px-2.5 py-0.5 rounded text-[10px] uppercase font-extrabold tracking-wider animate-pulse">
+                        <span className="bg-focus text-ink px-2.5 py-0.5 rounded text-[10px] uppercase font-extrabold tracking-wider animate-pulse">
                           CURRENT
                         </span>
                       )}
                     </div>
 
-                    <h3 className="font-extrabold text-sm sm:text-base tracking-wide leading-snug">{m.title}</h3>
-                    <p className="text-xs text-black/80 mt-1 line-clamp-1 font-medium">{m.tagline}</p>
+                    <h3 className="font-extrabold text-sm sm:text-base tracking-tight leading-snug text-ink">{m.title}</h3>
+                    <p className="text-xs text-ink-muted line-clamp-1 font-medium">{m.tagline}</p>
 
-                    <div className="pt-2 flex items-center gap-3 text-[10px] text-black/60 font-semibold">
-                      <span>Day {m.journeyDay}</span>
-                      {m.targetWeek && <span>· Week {m.targetWeek}</span>}
+                    {/* Progress bar */}
+                    <div className="space-y-1 pt-1">
+                      <div className="flex justify-between text-[10px] font-mono font-bold text-ink-muted">
+                        <span>{compCount} / {reqCount} topics</span>
+                        <span>{progressPct}%</span>
+                      </div>
+                      <div className="w-full bg-surface-muted rounded-full h-1.5 overflow-hidden">
+                        <div
+                          className={clsx('h-full rounded-full transition-all', isCompleted ? 'bg-accent' : 'bg-focus')}
+                          style={{ width: `${progressPct}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-1 flex items-center gap-2 text-[10px] font-mono text-ink-muted font-semibold">
+                      <span>Day {m.startJourneyDay || m.journeyDay}{m.endJourneyDay && m.endJourneyDay !== m.startJourneyDay ? `–${m.endJourneyDay}` : ''}</span>
+                      {m.targetWeek && <span>· W{m.targetWeek}</span>}
                       <span>· {formatShortISTDate(m.targetDate)}</span>
                     </div>
                   </div>
@@ -155,15 +162,15 @@ export const MilestonesPage: React.FC = () => {
                   {/* Node Connector Icon */}
                   <div
                     className={clsx(
-                      'w-14 h-14 rounded-2xl border-2 border-zinc-200 flex items-center justify-center shrink-0 font-extrabold text-base transition-all shadow-crisp',
+                      'w-14 h-14 rounded-2xl border-2 border-border flex items-center justify-center shrink-0 font-mono font-extrabold text-base transition-all shadow-crisp',
                       isCompleted
-                        ? 'bg-accent text-highlight border-black'
+                        ? 'bg-accent text-white border-accent'
                         : isCurrent
-                        ? 'bg-highlight text-black ring-4 ring-accent scale-110 border-black'
-                        : 'bg-canvas text-black'
+                        ? 'bg-focus text-ink ring-4 ring-focus/40 scale-110 border-focus'
+                        : 'bg-surface text-ink-muted'
                     )}
                   >
-                    {isCompleted ? <CheckCircle2 className="w-7 h-7 text-highlight" /> : m.order}
+                    {isCompleted ? <CheckCircle2 className="w-7 h-7 text-white" /> : m.order}
                   </div>
 
                   <div className="flex-1 hidden sm:block" />
@@ -176,18 +183,18 @@ export const MilestonesPage: React.FC = () => {
         {/* Right: Selected Milestone Detail Inspector (5 cols) */}
         <div className="lg:col-span-5 sticky top-20">
           {selectedMilestone && (
-            <div className="bg-highlight border-2 border-zinc-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-crisp text-black">
-              <div className="border-b-2 border-black pb-4 space-y-2">
-                <div className="flex items-center justify-between text-xs font-bold tracking-wider">
-                  <span className="uppercase bg-accent text-highlight px-3 py-1 rounded-md border-2 border-zinc-200 shadow-crisp-sm">
+            <div className="bg-surface border-2 border-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-crisp text-ink">
+              <div className="border-b-2 border-border pb-4 space-y-2">
+                <div className="flex items-center justify-between text-xs font-mono font-bold tracking-wider">
+                  <span className="uppercase bg-accent text-white px-3 py-1 rounded-md border border-accent shadow-crisp-sm">
                     Phase {selectedMilestone.phase} Milestone
                   </span>
-                  <span className="text-black/80 font-bold">
+                  <span className="text-ink-muted font-bold">
                     #{selectedMilestone.order} of {milestones.length}
                   </span>
                 </div>
 
-                <h2 className="text-xl sm:text-2xl font-extrabold tracking-wide leading-snug pt-1">
+                <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug pt-1 text-ink">
                   {selectedMilestone.title}
                 </h2>
                 {selectedMilestone.tagline && (
@@ -195,18 +202,44 @@ export const MilestonesPage: React.FC = () => {
                     "{selectedMilestone.tagline}"
                   </p>
                 )}
-                <p className="text-xs sm:text-sm text-black/85 leading-relaxed pt-1">
+                <p className="text-xs sm:text-sm text-ink-muted leading-relaxed pt-1">
                   {selectedMilestone.description}
                 </p>
 
+                {/* Progress Status Bar */}
+                <div className="pt-2 p-3 bg-surface-muted rounded-xl border border-border space-y-1.5 font-mono">
+                  <div className="flex justify-between text-xs font-bold text-ink">
+                    <span>Automated Progress</span>
+                    <span>{selectedMilestone.progressPct || 0}%</span>
+                  </div>
+                  <div className="w-full bg-surface-bright rounded-full h-2 overflow-hidden border border-border">
+                    <div
+                      className={clsx(
+                        'h-full rounded-full transition-all',
+                        selectedMilestone.status === 'completed' ? 'bg-accent' : 'bg-focus'
+                      )}
+                      style={{ width: `${selectedMilestone.progressPct || 0}%` }}
+                    />
+                  </div>
+                  <div className="text-[11px] text-ink-muted flex justify-between pt-0.5">
+                    <span>
+                      {selectedMilestone.completedItemCount || 0} / {selectedMilestone.requiredItemCount ?? selectedMilestone.requiredItemIds?.length ?? 0} topics completed
+                    </span>
+                    <span className="capitalize font-bold text-accent">{selectedMilestone.status}</span>
+                  </div>
+                </div>
+
                 {/* Target Metadata Bar */}
-                <div className="pt-2 flex flex-wrap items-center gap-3 text-xs font-bold text-black/75">
-                  <span className="inline-flex items-center gap-1.5 bg-canvas px-2.5 py-1 rounded-lg border border-zinc-300">
+                <div className="pt-2 flex flex-wrap items-center gap-2 text-xs font-mono font-bold text-ink-muted">
+                  <span className="inline-flex items-center gap-1.5 bg-surface-muted px-2.5 py-1 rounded-lg border border-border">
                     <Calendar className="w-3.5 h-3.5 text-accent" />
                     Target: {formatShortISTDate(selectedMilestone.targetDate)}
                   </span>
-                  <span className="bg-canvas px-2.5 py-1 rounded-lg border border-zinc-300">
-                    Day {selectedMilestone.journeyDay} {selectedMilestone.targetWeek ? `· Week ${selectedMilestone.targetWeek}` : ''}
+                  <span className="bg-surface-muted px-2.5 py-1 rounded-lg border border-border">
+                    Day {selectedMilestone.startJourneyDay || selectedMilestone.journeyDay}
+                    {selectedMilestone.endJourneyDay && selectedMilestone.endJourneyDay !== selectedMilestone.startJourneyDay
+                      ? `–${selectedMilestone.endJourneyDay}`
+                      : ''}
                   </span>
                   {selectedMilestone.projectId && (
                     <span className="inline-flex items-center gap-1 bg-accent/15 text-accent px-2.5 py-1 rounded-lg border border-accent/30">
@@ -220,11 +253,11 @@ export const MilestonesPage: React.FC = () => {
               {/* Acceptance Criteria */}
               {selectedMilestone.acceptanceCriteria && selectedMilestone.acceptanceCriteria.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent flex items-center gap-1.5">
+                  <h4 className="text-xs font-mono font-extrabold uppercase tracking-widest text-accent flex items-center gap-1.5">
                     <CheckSquare className="w-4 h-4" />
                     Acceptance Criteria
                   </h4>
-                  <ul className="text-xs sm:text-sm text-black space-y-2 bg-canvas/60 p-4 sm:p-5 rounded-2xl border-2 border-zinc-200 leading-relaxed font-medium shadow-crisp-sm">
+                  <ul className="text-xs sm:text-sm text-ink space-y-2 bg-surface-muted p-4 sm:p-5 rounded-2xl border border-border leading-relaxed font-medium shadow-crisp-sm">
                     {selectedMilestone.acceptanceCriteria.map((criterion, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <span className="text-accent font-bold">✓</span>
@@ -238,14 +271,14 @@ export const MilestonesPage: React.FC = () => {
               {/* Technologies */}
               {selectedMilestone.technologies && selectedMilestone.technologies.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent">
+                  <h4 className="text-xs font-mono font-extrabold uppercase tracking-widest text-accent">
                     Core Technologies
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedMilestone.technologies.map((t) => (
                       <span
                         key={t}
-                        className="text-xs font-bold px-3 py-1 rounded-lg bg-canvas border-2 border-zinc-200 text-black shadow-crisp-sm"
+                        className="text-xs font-mono font-bold px-3 py-1 rounded-lg bg-surface-muted border border-border text-ink shadow-crisp-sm"
                       >
                         {t}
                       </span>
@@ -257,10 +290,10 @@ export const MilestonesPage: React.FC = () => {
               {/* Topics Covered */}
               {selectedMilestone.topicsCovered && selectedMilestone.topicsCovered.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent">
+                  <h4 className="text-xs font-mono font-extrabold uppercase tracking-widest text-accent">
                     Curriculum Focus
                   </h4>
-                  <ul className="text-xs sm:text-sm text-black space-y-1.5 list-disc list-inside bg-canvas/60 p-4 rounded-2xl border-2 border-zinc-200 leading-relaxed font-medium shadow-crisp-sm">
+                  <ul className="text-xs sm:text-sm text-ink space-y-1.5 list-disc list-inside bg-surface-muted p-4 rounded-2xl border border-border leading-relaxed font-medium shadow-crisp-sm">
                     {selectedMilestone.topicsCovered.map((topic, i) => (
                       <li key={i}>{topic}</li>
                     ))}
@@ -270,7 +303,7 @@ export const MilestonesPage: React.FC = () => {
 
               {/* Milestone Personal Notes */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between font-mono">
                   <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent">
                     Milestone Notes & Artifacts
                   </h4>
@@ -288,33 +321,16 @@ export const MilestonesPage: React.FC = () => {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Record verification notes, PR links or repository URLs for this milestone..."
-                  className="w-full bg-white border-2 border-zinc-200 focus:border-black rounded-2xl p-4 text-xs sm:text-sm text-black outline-none resize-y font-mono shadow-crisp-sm leading-relaxed"
+                  className="w-full bg-surface-bright border-2 border-border focus:border-accent rounded-2xl p-4 text-xs sm:text-sm text-ink outline-none resize-y font-mono shadow-crisp-sm leading-relaxed"
                 />
               </div>
 
-              {/* Action Button: Mark Completed */}
-              <div className="pt-2 border-t-2 border-black">
-                <button
-                  onClick={() => handleToggleCompletion(selectedMilestone)}
-                  className={clsx(
-                    'w-full py-3.5 rounded-2xl font-extrabold text-xs uppercase tracking-widest transition-all border-2 border-zinc-200 shadow-crisp flex items-center justify-center gap-2',
-                    selectedMilestone.status === 'completed'
-                      ? 'bg-canvas text-black hover:bg-white'
-                      : 'bg-accent hover:bg-black text-highlight'
-                  )}
-                >
-                  {selectedMilestone.status === 'completed' ? (
-                    <>
-                      <CheckCircle2 className="w-4 h-4 text-accent" />
-                      <span>COMPLETED · CLICK TO REOPEN</span>
-                    </>
-                  ) : (
-                    <>
-                      <Circle className="w-4 h-4 text-highlight/50" />
-                      <span>MARK MILESTONE COMPLETE</span>
-                    </>
-                  )}
-                </button>
+              {/* Automatic Progression Indicator */}
+              <div className="pt-2 border-t-2 border-border flex items-center gap-2 text-xs font-mono text-ink-muted">
+                <Lock className="w-4 h-4 text-accent shrink-0" />
+                <span>
+                  Milestone status is automated from topic completions. Manual override is disabled.
+                </span>
               </div>
             </div>
           )}

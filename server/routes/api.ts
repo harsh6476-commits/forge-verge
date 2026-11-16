@@ -15,6 +15,10 @@ import {
   updateMilestoneNotes,
 } from '../controllers/milestonesController.js';
 import {
+  getCurriculumList,
+  getCurriculumItemDetails,
+} from '../controllers/curriculumController.js';
+import {
   uploadMiddleware,
   uploadAttachment,
   deleteAttachment,
@@ -51,6 +55,10 @@ router.get('/progress/history', getProgressHistory);
 router.get('/milestones', getMilestones);
 router.patch('/milestones/:id/completion', updateMilestoneCompletion);
 router.put('/milestones/:id/notes', updateMilestoneNotes);
+
+// Topics / Full 18-Month Curriculum Catalog
+router.get('/curriculum', getCurriculumList);
+router.get('/curriculum/:itemId', getCurriculumItemDetails);
 
 // Attachments
 router.post('/attachments', uploadMiddleware, uploadAttachment);

@@ -14,8 +14,13 @@ function getClientIp(req: Request): string {
 }
 
 export async function unlockAccess(req: Request, res: Response): Promise<void> {
+  const configuredPin = process.env.APP_ACCESS_PIN;
+  if (!configuredPin) {
+    res.status(500).json({ error: 'Server setup error: APP_ACCESS_PIN is not configured in environment.' });
+    return;
+  }
+
   const { pin } = req.body;
-  const configuredPin = process.env.APP_ACCESS_PIN || '1234';
   const ip = getClientIp(req);
   const now = Date.now();
 
@@ -53,10 +58,12 @@ export async function unlockAccess(req: Request, res: Response): Promise<void> {
       expiresAt,
     });
   } catch (err) {
-    console.warn('Could not save session to MongoDB, using memory fallback:', err);
+    console.error('Failed to persist session to database:', err);
+    res.status(503).json({ error: 'Authentication service temporarily unavailable' });
+    return;
   }
 
-  // Set HttpOnly cookie
+  // Set HttpOnly cookie only after successful database persistence
   res.cookie('forge_access', rawToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -96,9 +103,8 @@ export async function checkSession(req: Request, res: Response): Promise<void> {
       authenticated: true,
       expiresAt: session.expiresAt,
     });
-  } catch (err) {
-    // If DB is offline, allow if token is well-formed for graceful local dev
-    res.json({ authenticated: true });
+  } catch {
+    res.status(503).json({ error: 'Database unavailable for session verification', authenticated: false });
   }
 }
 
@@ -139,9 +145,8 @@ export async function requireAccess(req: Request, res: Response, next: NextFunct
     }
 
     next();
-  } catch (err) {
-    // If Mongo is temporarily unavailable during local dev, allow request
-    next();
+  } catch {
+    res.status(503).json({ error: 'Database unavailable for session verification' });
   }
 }
 

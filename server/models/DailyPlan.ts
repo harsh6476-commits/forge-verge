@@ -16,6 +16,7 @@ export interface IAssignedItem {
     completed: boolean;
   }[];
   practicalTask?: string;
+  supportingPractice?: string;
   expectedOutcome?: string;
   estimatedMinutes: number;
   completed: boolean;
@@ -62,6 +63,7 @@ const AssignedItemSchema = new Schema({
     },
   ],
   practicalTask: { type: String },
+  supportingPractice: { type: String, default: '' },
   expectedOutcome: { type: String },
   estimatedMinutes: { type: Number, default: 45 },
   completed: { type: Boolean, default: false },

@@ -7,38 +7,33 @@ export default {
   theme: {
     extend: {
       colors: {
-        // User color specification:
-        // Main contrast & background: #A5A79B
-        // Highlighted color: #E8D2B5
-        // Contrast adding color to balance out both: #590907
-        // Black logos, text, outline as zinc-200, shadows
-        canvas: '#A5A79B',
-        highlight: '#E8D2B5',
-        accent: '#590907',
-        'accent-hover': '#420605',
-        'accent-soft': '#59090715',
-        ink: '#000000',
-        inkmuted: '#1f201d',
-        outline: '#e4e4e7', // zinc-200
+        // V2 Palette — deep slate canvas, warm ivory cards, teal active, amber current marker
+        canvas:          '#17212B',   // deep slate/navy app background
+        surface:         '#F4EFE5',   // warm ivory — main cards
+        'surface-muted': '#E8E0D3',   // secondary panels
+        'surface-bright':'#FFFDF8',   // topic rows / input surfaces
+        ink:             '#17202A',   // primary text on light surfaces
+        'ink-muted':     '#52616B',   // secondary text
+        accent:          '#0D6B66',   // teal — active controls, progress, selected
+        'accent-hover':  '#095650',
+        'accent-fg':     '#FFFFFF',
+        success:         '#1F6B45',   // completed items
+        'success-soft':  '#DDEDE3',
+        focus:           '#F2B544',   // amber — current milestone marker / focus ring
+        border:          '#293743',   // subtle border on slate background
+        // Legacy compat aliases kept for gradual migration
+        highlight:       '#F4EFE5',
       },
       fontFamily: {
+        // Inter/Manrope for body; JetBrains Mono reserved for code/metadata
+        sans: ['Inter', 'Manrope', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'Fira Code', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
-        sans: ['"JetBrains Mono"', 'monospace'],
-      },
-      letterSpacing: {
-        tighter: '-0.02em',
-        tight: '0.01em',
-        normal: '0.05em',
-        wide: '0.08em',
-        wider: '0.12em',
-        widest: '0.18em',
       },
       boxShadow: {
-        crisp: '4px 4px 0px 0px rgba(0, 0, 0, 0.95)',
-        'crisp-lg': '6px 6px 0px 0px rgba(0, 0, 0, 0.95)',
-        'crisp-sm': '2px 2px 0px 0px rgba(0, 0, 0, 0.95)',
-        deep: '0 20px 35px -5px rgba(89, 9, 7, 0.3), 0 10px 15px -5px rgba(0, 0, 0, 0.4)',
-        glow: '0 0 20px 2px rgba(89, 9, 7, 0.25)',
+        crisp:    '3px 3px 0px 0px rgba(23, 32, 43, 0.60)',
+        'crisp-lg': '5px 5px 0px 0px rgba(23, 32, 43, 0.60)',
+        'crisp-sm': '2px 2px 0px 0px rgba(23, 32, 43, 0.50)',
+        card:     '0 2px 8px 0 rgba(23, 32, 43, 0.12)',
       },
     },
   },

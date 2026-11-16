@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IMilestone extends Document {
-  milestoneId: string;
+  milestoneId: string; // M01 .. M17
   order: number;
   phase: number;
   targetWeek: number | null;
@@ -13,6 +13,13 @@ export interface IMilestone extends Document {
   technologies: string[];
   topicsCovered: string[];
   acceptanceCriteria: string[];
+  startJourneyDay: number;
+  endJourneyDay: number;
+  requiredItemIds: string[];
+  requiredItemCount: number;
+  progressRule?: string;
+  completedItemCount: number;
+  progressPct: number;
   status: 'upcoming' | 'current' | 'completed';
   completedDate?: string | null;
   notes: string;
@@ -22,7 +29,7 @@ export interface IMilestone extends Document {
 const MilestoneSchema = new Schema<IMilestone>({
   milestoneId: { type: String, required: true, unique: true, index: true },
   order: { type: Number, required: true, unique: true, index: true },
-  phase: { type: Number, required: true },
+  phase: { type: Number, required: true, index: true },
   targetWeek: { type: Number, default: null },
   journeyDay: { type: Number, required: true },
   targetDate: { type: String, required: true },
@@ -32,11 +39,17 @@ const MilestoneSchema = new Schema<IMilestone>({
   technologies: [{ type: String }],
   topicsCovered: [{ type: String }],
   acceptanceCriteria: [{ type: String }],
-  status: { type: String, enum: ['upcoming', 'current', 'completed'], default: 'upcoming' },
+  startJourneyDay: { type: Number, required: true },
+  endJourneyDay: { type: Number, required: true },
+  requiredItemIds: [{ type: String }],
+  requiredItemCount: { type: Number, required: true },
+  progressRule: { type: String },
+  completedItemCount: { type: Number, default: 0 },
+  progressPct: { type: Number, default: 0 },
+  status: { type: String, enum: ['upcoming', 'current', 'completed'], default: 'upcoming', index: true },
   completedDate: { type: String, default: null },
   notes: { type: String, default: '' },
   projectId: { type: String, default: null },
 });
 
 export default mongoose.models.Milestone || mongoose.model<IMilestone>('Milestone', MilestoneSchema);
-
