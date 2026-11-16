@@ -19,7 +19,8 @@ export async function getTodayPlan(_req: Request, res: Response): Promise<void> 
 }
 
 export async function getPlanByDate(req: Request, res: Response): Promise<void> {
-  const dateStr = (req.query.date as string) || req.params.date || formatISTDate();
+  const rawDate = req.query.date || req.params.date;
+  const dateStr = typeof rawDate === 'string' ? rawDate : formatISTDate();
   try {
     const plan = await getOrCreateDailyPlan(dateStr);
     if (!plan) {

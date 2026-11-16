@@ -27,7 +27,7 @@ export async function uploadAttachment(req: Request, res: Response): Promise<voi
       return;
     }
 
-    const item = plan.assignedItems.find(i => i.itemId === itemId);
+    const item = plan.assignedItems.find((i: any) => i.itemId === itemId);
     if (!item) {
       res.status(404).json({ error: 'Item not found in plan' });
       return;
@@ -78,16 +78,16 @@ export async function deleteAttachment(req: Request, res: Response): Promise<voi
     if (date && itemId) {
       const plan = await DailyPlan.findOne({ date: String(date) });
       if (plan) {
-        const item = plan.assignedItems.find(i => i.itemId === String(itemId));
+        const item = plan.assignedItems.find((i: any) => i.itemId === String(itemId));
         if (item) {
-          item.attachments = item.attachments.filter(a => a.publicId !== id);
+          item.attachments = item.attachments.filter((a: any) => a.publicId !== id);
           await plan.save();
         }
       }
     }
 
     // Delete from Cloudinary
-    await cloudinary.uploader.destroy(id).catch(() => {});
+    await cloudinary.uploader.destroy(String(id)).catch(() => {});
 
     res.json({ success: true, message: 'Attachment deleted' });
   } catch (err: any) {

@@ -4,7 +4,7 @@ import { api } from '../services/api';
 import { DailyPlan, AssignedItem, ProgressSummary } from '../types/api';
 import { formatHumanISTDate, formatISTDate, addDaysToDateStr } from '../lib/date-utils';
 import { TopicDetail } from '../components/TopicDetail';
-import { CheckCircle2, Circle, Clock, Flame, ChevronLeft, ChevronRight, AlertCircle, Calendar } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, Flame, ChevronLeft, ChevronRight, AlertCircle, Calendar, Bell } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { clsx } from 'clsx';
 
@@ -18,6 +18,9 @@ export const TodayPage: React.FC = () => {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+  );
 
   // Sync date when query parameter changes
   useEffect(() => {
@@ -63,34 +66,134 @@ export const TodayPage: React.FC = () => {
     loadData(currentDate);
   }, [currentDate]);
 
+  // Check and trigger push notification for incomplete tasks
+  const requestDesktopNotification = async () => {
+    if (typeof Notification === 'undefined') return;
+    try {
+      const perm = await Notification.requestPermission();
+      setNotifPermission(perm);
+      if (perm === 'granted') {
+        const incompleteCount = dailyPlan?.assignedItems.filter((i) => !i.completed).length || 0;
+        if (incompleteCount > 0) {
+          new Notification('FORGE OS: Daily Reminder', {
+            body: `You have ${incompleteCount} incomplete learning topic(s) scheduled for today. Keep your streak alive!`,
+          });
+        } else {
+          new Notification('FORGE OS', {
+            body: 'Desktop notifications are enabled. All tasks for today are completed!',
+          });
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  };
+
   const changeDate = (newDate: string) => {
     setCurrentDate(newDate);
     setSearchParams({ date: newDate });
   };
 
+  // ─── OPTIMISTIC SUBTOPIC TOGGLE (0ms perceived latency) ───────────────────
   const handleSubtopicToggle = async (itemId: string, subtopicId: string, completed: boolean) => {
+    if (!dailyPlan) return;
+
+    const previousPlan = dailyPlan;
+
+    // Build optimistic state immediately
+    const updatedItems = dailyPlan.assignedItems.map((item) => {
+      if (item.itemId !== itemId) return item;
+
+      const updatedSubtopics = item.subtopics.map((sub) =>
+        sub.id === subtopicId ? { ...sub, completed } : sub
+      );
+
+      const completedCount = updatedSubtopics.filter((s) => s.completed).length;
+      const totalCount = updatedSubtopics.length;
+      const allCompleted = totalCount > 0 && completedCount === totalCount;
+      const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : completed ? 100 : 0;
+
+      return {
+        ...item,
+        subtopics: updatedSubtopics,
+        completed: allCompleted,
+        progressPct,
+      };
+    });
+
+    const completedItemsCount = updatedItems.filter((i) => i.completed).length;
+    const totalItemsCount = updatedItems.length;
+    const planProgressPct = totalItemsCount > 0 ? Math.round((completedItemsCount / totalItemsCount) * 100) : 0;
+    const planCompleted = totalItemsCount > 0 && completedItemsCount === totalItemsCount;
+
+    const optimisticPlan: DailyPlan = {
+      ...dailyPlan,
+      assignedItems: updatedItems,
+      completionPercentage: planProgressPct,
+      completed: planCompleted,
+    };
+
+    // Instant UI update
+    setDailyPlan(optimisticPlan);
+
+    if (planCompleted && !previousPlan.completed) {
+      confetti({ particleCount: 90, spread: 70, origin: { y: 0.7 } });
+    }
+
     try {
       const res = await api.updateSubtopicCompletion(currentDate, itemId, subtopicId, completed);
       setDailyPlan(res.plan);
-
-      if (res.plan.completed && !dailyPlan?.completed) {
-        confetti({ particleCount: 90, spread: 70, origin: { y: 0.7 } });
-      }
     } catch (err) {
-      console.error(err);
+      console.error('Failed to sync subtopic completion, reverting optimistic update:', err);
+      setDailyPlan(previousPlan);
     }
   };
 
+  // ─── OPTIMISTIC ITEM TOGGLE (0ms perceived latency) ───────────────────────
   const handleItemToggle = async (itemId: string, completed: boolean) => {
+    if (!dailyPlan) return;
+
+    const previousPlan = dailyPlan;
+
+    // Build optimistic state immediately
+    const updatedItems = dailyPlan.assignedItems.map((item) => {
+      if (item.itemId !== itemId) return item;
+
+      const updatedSubtopics = item.subtopics.map((sub) => ({ ...sub, completed }));
+
+      return {
+        ...item,
+        subtopics: updatedSubtopics,
+        completed,
+        progressPct: completed ? 100 : 0,
+      };
+    });
+
+    const completedItemsCount = updatedItems.filter((i) => i.completed).length;
+    const totalItemsCount = updatedItems.length;
+    const planProgressPct = totalItemsCount > 0 ? Math.round((completedItemsCount / totalItemsCount) * 100) : 0;
+    const planCompleted = totalItemsCount > 0 && completedItemsCount === totalItemsCount;
+
+    const optimisticPlan: DailyPlan = {
+      ...dailyPlan,
+      assignedItems: updatedItems,
+      completionPercentage: planProgressPct,
+      completed: planCompleted,
+    };
+
+    // Instant UI update
+    setDailyPlan(optimisticPlan);
+
+    if (planCompleted && !previousPlan.completed) {
+      confetti({ particleCount: 90, spread: 70, origin: { y: 0.7 } });
+    }
+
     try {
       const res = await api.updateItemCompletion(currentDate, itemId, completed);
       setDailyPlan(res.plan);
-
-      if (res.plan.completed && !dailyPlan?.completed) {
-        confetti({ particleCount: 90, spread: 70, origin: { y: 0.7 } });
-      }
     } catch (err) {
-      console.error(err);
+      console.error('Failed to sync item completion, reverting optimistic update:', err);
+      setDailyPlan(previousPlan);
     }
   };
 
@@ -135,6 +238,14 @@ export const TodayPage: React.FC = () => {
   const completedCount = dailyPlan?.assignedItems.filter((i) => i.completed).length || 0;
   const totalCount = dailyPlan?.assignedItems.length || 0;
   const progressPct = dailyPlan?.completionPercentage || 0;
+
+  // Calculate live streak: if today is completed, ensure at least 1 or increment
+  const isTodayDate = currentDate === formatISTDate();
+  const liveStreak = summary
+    ? summary.todayPlan?.completed || (isTodayDate && dailyPlan?.completed)
+      ? Math.max(summary.streak, 1)
+      : summary.streak
+    : 0;
 
   return (
     <div className="max-w-7xl mx-auto px-6 sm:px-8 py-8 space-y-8 font-sans text-ink">
@@ -188,13 +299,28 @@ export const TodayPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Progress Metrics & Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 shrink-0">
+        {/* Progress Metrics, Streak & System Notification Pill */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 shrink-0">
+          {/* Notification Button */}
+          {typeof Notification !== 'undefined' && notifPermission !== 'granted' && (
+            <button
+              onClick={requestDesktopNotification}
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-surface-muted hover:bg-surface-bright border-2 border-border shadow-crisp-sm font-mono text-xs font-bold text-ink transition-colors"
+              title="Enable desktop notifications for incomplete tasks"
+            >
+              <Bell className="w-4 h-4 text-focus" />
+              <span>Remind Me</span>
+            </button>
+          )}
+
+          {/* Streak pill */}
           <div className="flex items-center gap-3 text-xs bg-surface-muted px-4 py-3 rounded-2xl border-2 border-border shadow-crisp-sm font-mono">
             <Flame className="w-5 h-5 text-focus fill-focus" />
             <div>
-              <div className="text-ink font-extrabold tracking-wider">{summary?.streak || 0} DAY STREAK</div>
-              <div className="text-[10px] text-ink-muted font-bold uppercase tracking-wider">Daily Habit</div>
+              <div className="text-ink font-extrabold tracking-wider">{liveStreak} DAY STREAK</div>
+              <div className="text-[10px] text-ink-muted font-bold uppercase tracking-wider">
+                {liveStreak > 0 ? 'Consecutive Focus' : 'Build Your Habit'}
+              </div>
             </div>
           </div>
 
@@ -208,7 +334,7 @@ export const TodayPage: React.FC = () => {
               </div>
               <div className="w-full bg-surface-muted rounded-full h-3.5 overflow-hidden border border-border shadow-crisp-sm">
                 <div
-                  className="bg-accent h-full rounded-full transition-all duration-500"
+                  className="bg-accent h-full rounded-full transition-all duration-300"
                   style={{ width: `${progressPct}%` }}
                 />
               </div>

@@ -22,7 +22,7 @@ export async function updateMilestoneCompletion(_req: Request, res: Response): P
 }
 
 export async function updateMilestoneNotes(req: Request, res: Response): Promise<void> {
-  const { id } = req.params;
+  const id = String(req.params.id);
   const { notes } = req.body;
 
   try {

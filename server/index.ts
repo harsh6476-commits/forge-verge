@@ -8,6 +8,32 @@ import { seedInitialCurriculum } from './services/curriculumService.js';
 
 dotenv.config();
 
+export function validateEnvironment(): void {
+  const missing: string[] = [];
+  if (!process.env.MONGODB_URI) {
+    missing.push('MONGODB_URI');
+  }
+  if (!process.env.APP_ACCESS_PIN) {
+    missing.push('APP_ACCESS_PIN');
+  }
+  if (missing.length > 0) {
+    const msg = `FATAL: Missing required environment variable(s): ${missing.join(', ')}. Server cannot start securely.`;
+    console.error(msg);
+    if (process.env.NODE_ENV !== 'test') {
+      throw new Error(msg);
+    }
+  }
+}
+
+// Validate environment on startup
+try {
+  validateEnvironment();
+} catch {
+  if (process.env.NODE_ENV !== 'test') {
+    process.exit(1);
+  }
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';

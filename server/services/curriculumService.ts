@@ -58,7 +58,7 @@ interface RawMilestone {
 
 let curriculumByDate: Map<string, RawDay> | null = null;
 let curriculumByItemId: Map<string, RawDay> | null = null;
-let cachedMilestones: RawMilestone[] | null = null;
+let cachedMilestones: RawMilestone[] = [];
 let projectsMap: Map<string, any> = new Map();
 let researchCheckpoints: any[] = [];
 
@@ -69,7 +69,7 @@ export function loadCurriculumData(): {
   projectsMap: Map<string, any>;
   researchCheckpoints: any[];
 } {
-  if (curriculumByDate && curriculumByItemId && cachedMilestones) {
+  if (curriculumByDate && curriculumByItemId && cachedMilestones.length > 0) {
     return {
       curriculumByDate,
       curriculumByItemId,

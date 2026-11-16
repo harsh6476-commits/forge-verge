@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
+import mongoose from 'mongoose';
 import AccessSession from '../models/AccessSession.js';
 
 // Rate limiting in-memory map
@@ -14,6 +15,11 @@ function getClientIp(req: Request): string {
 }
 
 export async function unlockAccess(req: Request, res: Response): Promise<void> {
+  if (mongoose.connection.readyState !== 1) {
+    res.status(503).json({ error: 'Database unavailable for authentication' });
+    return;
+  }
+
   const configuredPin = process.env.APP_ACCESS_PIN;
   if (!configuredPin) {
     res.status(500).json({ error: 'Server setup error: APP_ACCESS_PIN is not configured in environment.' });
@@ -79,6 +85,11 @@ export async function unlockAccess(req: Request, res: Response): Promise<void> {
 }
 
 export async function checkSession(req: Request, res: Response): Promise<void> {
+  if (mongoose.connection.readyState !== 1) {
+    res.status(503).json({ error: 'Database unavailable for session verification', authenticated: false });
+    return;
+  }
+
   const token = req.cookies?.forge_access;
   if (!token) {
     res.status(401).json({ authenticated: false });
@@ -124,6 +135,11 @@ export async function lockAccess(req: Request, res: Response): Promise<void> {
 }
 
 export async function requireAccess(req: Request, res: Response, next: NextFunction): Promise<void> {
+  if (mongoose.connection.readyState !== 1) {
+    res.status(503).json({ error: 'Database unavailable for session verification' });
+    return;
+  }
+
   const token = req.cookies?.forge_access;
   if (!token) {
     res.status(401).json({ error: 'Access PIN required' });

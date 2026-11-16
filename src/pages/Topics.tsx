@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { api } from '../services/api';
 import {
   CurriculumCatalogItem,
@@ -20,6 +20,8 @@ import {
   BarChart2,
   AlertCircle,
   Code2,
+  Calendar,
+  Grid,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { formatShortISTDate } from '../lib/date-utils';
@@ -39,7 +41,30 @@ const KIND_COLORS: Record<CurriculumKind, string> = {
   review: 'bg-surface-muted text-ink-muted border-border',
 };
 
-
+const COMMON_CATEGORIES = [
+  'DSA',
+  'C++ / DSA',
+  'Algorithms',
+  'Web Foundations',
+  'JavaScript',
+  'TypeScript',
+  'React',
+  'Node.js',
+  'MongoDB',
+  'SQL',
+  'Java',
+  'Spring Boot',
+  'Operating Systems',
+  'Computer Networks',
+  'Database Engineering',
+  'System Design',
+  'Docker',
+  'DevOps',
+  'AWS',
+  'AI Engineering',
+  'Checkpoint',
+  'Weekly Review',
+];
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -83,17 +108,17 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({ itemId, onClose, onOpenToda
 
       {/* Drawer panel */}
       <div
-        className="relative w-full max-w-xl h-full bg-surface flex flex-col overflow-hidden border-l-2 border-black shadow-2xl"
+        className="relative w-full max-w-xl h-full bg-surface flex flex-col overflow-hidden border-l-2 border-border shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Drawer Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-black bg-surface-bright shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-border bg-surface-bright shrink-0">
           <span className="font-mono text-xs font-bold text-ink-muted uppercase tracking-widest">
             TOPIC DETAIL
           </span>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg border-2 border-zinc-200 bg-surface hover:bg-surface-muted text-ink transition-colors"
+            className="p-1.5 rounded-lg border-2 border-border bg-surface hover:bg-surface-muted text-ink transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -119,7 +144,7 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({ itemId, onClose, onOpenToda
               <span className={clsx('px-3 py-1 rounded-md text-[11px] font-bold border tracking-wider font-mono', KIND_COLORS[item.kind])}>
                 {KIND_LABELS[item.kind]}
               </span>
-              <span className="px-3 py-1 rounded-md text-[11px] font-bold border border-zinc-200 bg-surface-muted text-ink font-mono tracking-wider">
+              <span className="px-3 py-1 rounded-md text-[11px] font-bold border border-border bg-surface-muted text-ink font-mono tracking-wider">
                 {item.category}
               </span>
               {item.completed && (
@@ -137,33 +162,33 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({ itemId, onClose, onOpenToda
             {/* Meta info row */}
             <div className="flex flex-wrap gap-3 text-xs font-mono font-bold text-ink-muted">
               <span className="flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5" />
-                Phase {item.phase}, Week {item.phaseWeek}
+                <Layers className="w-3.5 h-3.5 text-accent" />
+                Phase {item.phase}, Week {item.phaseWeek} (W{item.globalWeek})
               </span>
               <span className="flex items-center gap-1.5">
-                <BarChart2 className="w-3.5 h-3.5" />
+                <BarChart2 className="w-3.5 h-3.5 text-accent" />
                 Day {item.journeyDay}
               </span>
               <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
+                <Clock className="w-3.5 h-3.5 text-accent" />
                 {item.minutes}m
               </span>
               {item.date && (
                 <span className="flex items-center gap-1.5">
-                  <Tag className="w-3.5 h-3.5" />
+                  <Tag className="w-3.5 h-3.5 text-accent" />
                   {formatShortISTDate(item.date)}
                 </span>
               )}
             </div>
 
-            {/* Progress bar (if in progress) */}
+            {/* Progress bar */}
             {item.progressPct > 0 && !item.completed && (
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs font-mono font-bold text-ink-muted">
                   <span>Progress</span>
                   <span>{item.progressPct}%</span>
                 </div>
-                <div className="w-full bg-surface-muted rounded-full h-2 overflow-hidden border border-zinc-200">
+                <div className="w-full bg-surface-muted rounded-full h-2 overflow-hidden border border-border">
                   <div
                     className="bg-accent h-full rounded-full transition-all"
                     style={{ width: `${item.progressPct}%` }}
@@ -182,12 +207,12 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({ itemId, onClose, onOpenToda
               </div>
             )}
 
-            {/* Subtopics / what you'll learn */}
+            {/* Subtopics Checklist */}
             {item.subtopicItems && item.subtopicItems.length > 0 && (
               <div className="space-y-2">
                 <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent font-mono flex items-center gap-1.5">
                   <BookOpen className="w-3.5 h-3.5" />
-                  Subtopics
+                  Subtopics Checklist
                 </h4>
                 <ul className="space-y-2">
                   {item.subtopicItems.map((sub, i) => {
@@ -195,12 +220,12 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({ itemId, onClose, onOpenToda
                     return (
                       <li
                         key={sub.id || i}
-                        className="flex items-start gap-2.5 text-sm text-ink bg-surface-muted px-4 py-3 rounded-xl border border-zinc-200"
+                        className="flex items-start gap-2.5 text-sm text-ink bg-surface-muted px-4 py-3 rounded-xl border border-border"
                       >
                         {isComplete ? (
                           <CheckCircle2 className="w-4 h-4 text-accent shrink-0 mt-0.5" />
                         ) : (
-                          <span className="w-4 h-4 rounded-full border-2 border-zinc-300 shrink-0 mt-0.5" />
+                          <span className="w-4 h-4 rounded-full border-2 border-border shrink-0 mt-0.5" />
                         )}
                         <div>
                           <span className={clsx('font-semibold', isComplete && 'line-through text-ink-muted')}>
@@ -217,33 +242,14 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({ itemId, onClose, onOpenToda
               </div>
             )}
 
-            {/* Fallback: plain subtopics array */}
-            {(!item.subtopicItems || item.subtopicItems.length === 0) &&
-              item.subtopics &&
-              item.subtopics.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent font-mono">
-                    Subtopics
-                  </h4>
-                  <ul className="space-y-1.5 text-sm text-ink bg-surface-muted px-4 py-3 rounded-xl border border-zinc-200">
-                    {item.subtopics.map((s, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="text-accent font-bold">·</span>
-                        <span>{s}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
             {/* Practical Task */}
             {item.practice && (
               <div className="space-y-1.5">
                 <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent font-mono flex items-center gap-1.5">
                   <Code2 className="w-3.5 h-3.5" />
-                  Practice Task
+                  Practical Implementation
                 </h4>
-                <p className="text-sm text-ink leading-relaxed bg-surface-muted px-4 py-3 rounded-xl border border-zinc-200">
+                <p className="text-sm text-ink leading-relaxed bg-surface-muted px-4 py-3 rounded-xl border border-border">
                   {item.practice}
                 </p>
               </div>
@@ -252,8 +258,9 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({ itemId, onClose, onOpenToda
             {/* Supporting Practice (DSA Recall) */}
             {item.supportingPractice && (
               <div className="space-y-1.5">
-                <h4 className="text-xs font-extrabold uppercase tracking-widest text-focus font-mono">
-                  Supporting Practice
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-focus font-mono flex items-center gap-1.5">
+                  <Code2 className="w-3.5 h-3.5" />
+                  Supporting Practice / DSA Recall
                 </h4>
                 <p className="text-sm text-ink leading-relaxed bg-focus/10 px-4 py-3 rounded-xl border border-focus/30">
                   {item.supportingPractice}
@@ -267,7 +274,7 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({ itemId, onClose, onOpenToda
                 <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent font-mono">
                   Weekly Research Checkpoint
                 </h4>
-                <div className="bg-surface-muted px-4 py-3 rounded-xl border border-zinc-200 space-y-1.5 text-sm text-ink">
+                <div className="bg-surface-muted px-4 py-3 rounded-xl border border-border space-y-1.5 text-sm text-ink">
                   {typeof item.weekResearchCheckpoint === 'object' ? (
                     <>
                       <p className="font-semibold">{item.weekResearchCheckpoint.title}</p>
@@ -290,13 +297,13 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({ itemId, onClose, onOpenToda
                   <Layers className="w-3.5 h-3.5" />
                   Linked Project
                 </h4>
-                <div className="bg-surface-muted px-4 py-3 rounded-xl border border-zinc-200 space-y-1 text-sm text-ink">
+                <div className="bg-surface-muted px-4 py-3 rounded-xl border border-border space-y-1 text-sm text-ink">
                   <p className="font-bold">{item.linkedProject.title}</p>
                   <p className="text-ink-muted text-xs leading-relaxed">{item.linkedProject.description}</p>
                   {item.linkedProject.technologies && item.linkedProject.technologies.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 pt-1">
                       {item.linkedProject.technologies.map((t) => (
-                        <span key={t} className="text-[10px] font-mono font-bold px-2 py-0.5 bg-surface-bright rounded border border-zinc-200 text-ink">
+                        <span key={t} className="text-[10px] font-mono font-bold px-2 py-0.5 bg-surface-bright rounded border border-border text-ink">
                           {t}
                         </span>
                       ))}
@@ -310,7 +317,7 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({ itemId, onClose, onOpenToda
             {item.date && (
               <button
                 onClick={() => onOpenToday(item.date!)}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-black bg-accent text-white font-mono font-extrabold text-xs uppercase tracking-widest hover:bg-ink transition-colors shadow-crisp"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-border bg-accent text-white font-mono font-extrabold text-xs uppercase tracking-widest hover:bg-accent-hover transition-colors shadow-crisp"
               >
                 <ExternalLink className="w-4 h-4" />
                 Open Scheduled Day
@@ -323,9 +330,7 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({ itemId, onClose, onOpenToda
   );
 };
 
-// ─── Filter Bar ───────────────────────────────────────────────────────────────
-
-
+// ─── Filter Dropdown ──────────────────────────────────────────────────────────
 
 const SelectFilter: React.FC<{
   value: string;
@@ -337,7 +342,7 @@ const SelectFilter: React.FC<{
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="appearance-none pl-3 pr-7 py-2 text-xs font-mono font-bold border-2 border-zinc-200 rounded-xl bg-surface text-ink cursor-pointer hover:border-black focus:border-black outline-none shadow-crisp-sm transition-colors"
+      className="appearance-none pl-3 pr-7 py-2 text-xs font-mono font-bold border-2 border-border rounded-xl bg-surface text-ink cursor-pointer hover:border-black focus:border-accent outline-none shadow-crisp-sm transition-colors"
     >
       <option value="">{placeholder}</option>
       {options.map((o) => (
@@ -369,8 +374,8 @@ const ItemCard: React.FC<ItemCardProps> = ({ item, onClick }) => {
         isCompleted
           ? 'bg-green-50 border-green-200 hover:border-green-500 shadow-crisp-sm'
           : inProgress
-          ? 'bg-surface border-focus/40 hover:border-focus shadow-crisp-sm'
-          : 'bg-surface border-zinc-200 hover:border-black shadow-crisp-sm'
+          ? 'bg-surface border-focus/50 hover:border-focus shadow-crisp-sm'
+          : 'bg-surface border-border hover:border-black shadow-crisp-sm'
       )}
     >
       {/* Top row: kind + day */}
@@ -390,10 +395,10 @@ const ItemCard: React.FC<ItemCardProps> = ({ item, onClick }) => {
 
       {/* Category + duration */}
       <div className="flex items-center gap-3 text-[11px] font-mono text-ink-muted">
-        <span className="font-semibold">{item.category}</span>
+        <span className="font-semibold text-ink">{item.category}</span>
         <span>·</span>
         <span className="flex items-center gap-1">
-          <Clock className="w-3 h-3" />
+          <Clock className="w-3 h-3 text-accent" />
           {item.minutes}m
         </span>
         {item.date && (
@@ -427,7 +432,7 @@ interface SummaryBarProps {
 const SummaryBar: React.FC<SummaryBarProps> = ({ summary, total }) => {
   const pct = summary.totalItems > 0 ? Math.round((summary.completed / summary.totalItems) * 100) : 0;
   return (
-    <div className="bg-surface border-2 border-zinc-200 rounded-2xl p-4 flex flex-wrap gap-6 items-center shadow-crisp-sm">
+    <div className="bg-surface border-2 border-border rounded-2xl p-4 flex flex-wrap gap-6 items-center shadow-crisp-sm">
       <div className="flex flex-col text-center min-w-[52px]">
         <span className="text-lg font-extrabold font-mono text-accent">{summary.completed}</span>
         <span className="text-[10px] font-mono text-ink-muted uppercase tracking-widest">Done</span>
@@ -445,7 +450,7 @@ const SummaryBar: React.FC<SummaryBarProps> = ({ summary, total }) => {
           <span>18-Month Journey</span>
           <span>{pct}%</span>
         </div>
-        <div className="w-full bg-surface-muted rounded-full h-2 overflow-hidden border border-zinc-200">
+        <div className="w-full bg-surface-muted rounded-full h-2 overflow-hidden border border-border">
           <div className="bg-accent h-full rounded-full transition-all" style={{ width: `${pct}%` }} />
         </div>
       </div>
@@ -471,12 +476,13 @@ export const TopicsPage: React.FC = () => {
   const [searchInput, setSearchInput] = useState('');
   const [phase, setPhase] = useState('');
   const [kind, setKind] = useState('');
+  const [category, setCategory] = useState('');
   const [status, setStatus] = useState('');
+  const [groupByWeek, setGroupByWeek] = useState(false);
 
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(searchInput, 300);
-
   const loaderRef = useRef<HTMLDivElement>(null);
 
   const fetchItems = useCallback(
@@ -492,6 +498,7 @@ export const TopicsPage: React.FC = () => {
           limit: 24,
           ...(phase ? { phase: Number(phase) } : {}),
           ...(kind ? { kind } : {}),
+          ...(category ? { category } : {}),
           ...(status ? { status } : {}),
           ...(debouncedSearch ? { q: debouncedSearch } : {}),
         };
@@ -517,7 +524,7 @@ export const TopicsPage: React.FC = () => {
         setLoadingMore(false);
       }
     },
-    [phase, kind, status, debouncedSearch, nextCursor]
+    [phase, kind, category, status, debouncedSearch, nextCursor]
   );
 
   // Reset when filters change
@@ -525,7 +532,7 @@ export const TopicsPage: React.FC = () => {
     setNextCursor(null);
     fetchItems(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, kind, status, debouncedSearch]);
+  }, [phase, kind, category, status, debouncedSearch]);
 
   // Infinite scroll via IntersectionObserver
   useEffect(() => {
@@ -547,30 +554,45 @@ export const TopicsPage: React.FC = () => {
     navigate(`/?date=${date}`);
   };
 
-  const hasFilters = phase || kind || status || searchInput;
+  const hasFilters = phase || kind || category || status || searchInput;
   const clearFilters = () => {
     setSearchInput('');
     setPhase('');
     setKind('');
+    setCategory('');
     setStatus('');
   };
+
+  // Group items by Global Week if groupByWeek is active
+  const groupedItems = useMemo(() => {
+    if (!groupByWeek) return null;
+    const map = new Map<number, { phase: number; phaseWeek: number; items: CurriculumCatalogItem[] }>();
+    for (const item of items) {
+      const gw = item.globalWeek;
+      if (!map.has(gw)) {
+        map.set(gw, { phase: item.phase, phaseWeek: item.phaseWeek, items: [] });
+      }
+      map.get(gw)!.items.push(item);
+    }
+    return Array.from(map.entries()).sort((a, b) => a[0] - b[0]);
+  }, [items, groupByWeek]);
 
   return (
     <div className="max-w-6xl mx-auto px-6 sm:px-8 py-8 space-y-6 font-sans text-ink">
       {/* Page Header */}
       <div className="space-y-1">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
-          18-Month Curriculum
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight uppercase">
+          18-Month Curriculum Catalog
         </h1>
         <p className="text-sm text-ink-muted">
-          Browse all 547 topics, checkpoints and reviews across 6 phases.
+          Browse, filter, and inspect all 547 topics, practical tasks, and checkpoints across 6 phases.
         </p>
       </div>
 
       {/* Summary Stats */}
       {summary && <SummaryBar summary={summary} total={total} />}
 
-      {/* Search + Filters */}
+      {/* Search + Filters + Grouping Bar */}
       <div className="flex flex-wrap gap-3 items-center">
         {/* Search */}
         <div className="relative flex-1 min-w-[200px]">
@@ -580,7 +602,7 @@ export const TopicsPage: React.FC = () => {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search topics, practice, subtopics..."
-            className="w-full pl-9 pr-4 py-2.5 text-sm border-2 border-zinc-200 rounded-xl bg-surface text-ink placeholder:text-ink-muted focus:border-black outline-none shadow-crisp-sm transition-colors font-sans"
+            className="w-full pl-9 pr-4 py-2 text-xs font-mono font-bold border-2 border-border rounded-xl bg-surface text-ink placeholder:text-ink-muted focus:border-accent outline-none shadow-crisp-sm transition-colors"
           />
           {searchInput && (
             <button
@@ -598,6 +620,14 @@ export const TopicsPage: React.FC = () => {
           onChange={setPhase}
           placeholder="All Phases"
           options={[1, 2, 3, 4, 5, 6].map((n) => ({ value: String(n), label: `Phase ${n}` }))}
+        />
+
+        {/* Category filter */}
+        <SelectFilter
+          value={category}
+          onChange={setCategory}
+          placeholder="All Categories"
+          options={COMMON_CATEGORIES.map((c) => ({ value: c, label: c }))}
         />
 
         {/* Kind filter */}
@@ -624,11 +654,25 @@ export const TopicsPage: React.FC = () => {
           ]}
         />
 
+        {/* Group by Week toggle */}
+        <button
+          onClick={() => setGroupByWeek((prev) => !prev)}
+          className={clsx(
+            'flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono font-bold border-2 shadow-crisp-sm transition-colors',
+            groupByWeek
+              ? 'bg-accent text-white border-accent'
+              : 'bg-surface text-ink border-border hover:border-black'
+          )}
+        >
+          {groupByWeek ? <Layers className="w-3.5 h-3.5" /> : <Grid className="w-3.5 h-3.5" />}
+          <span>{groupByWeek ? 'Grouped by Week' : 'Grid View'}</span>
+        </button>
+
         {/* Clear filters */}
         {hasFilters && (
           <button
             onClick={clearFilters}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono font-bold border-2 border-zinc-200 bg-surface text-ink-muted hover:border-black hover:text-ink transition-colors shadow-crisp-sm"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono font-bold border-2 border-border bg-surface text-ink-muted hover:border-black hover:text-ink transition-colors shadow-crisp-sm"
           >
             <X className="w-3.5 h-3.5" />
             Clear
@@ -636,7 +680,7 @@ export const TopicsPage: React.FC = () => {
         )}
       </div>
 
-      {/* Grid */}
+      {/* Grid or Grouped Layout */}
       {loading ? (
         <div className="flex items-center justify-center py-20 gap-3 text-ink-muted">
           <Loader2 className="w-5 h-5 animate-spin text-accent" />
@@ -655,7 +699,39 @@ export const TopicsPage: React.FC = () => {
             </button>
           )}
         </div>
+      ) : groupedItems ? (
+        /* Week Grouped View */
+        <div className="space-y-8">
+          {groupedItems.map(([gw, group]) => {
+            const completedInWeek = group.items.filter((i) => i.completed).length;
+            return (
+              <div key={gw} className="space-y-3">
+                <div className="flex items-center justify-between border-b-2 border-border pb-2">
+                  <div className="flex items-center gap-2 font-mono font-extrabold text-xs uppercase tracking-wider text-ink">
+                    <Calendar className="w-4 h-4 text-accent" />
+                    <span>Phase {group.phase} · Week {group.phaseWeek}</span>
+                    <span className="text-ink-muted font-normal">(Global Week {gw})</span>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-ink-muted">
+                    {completedInWeek} / {group.items.length} Done
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {group.items.map((item) => (
+                    <ItemCard
+                      key={item.itemId}
+                      item={item}
+                      onClick={() => setSelectedItemId(item.itemId)}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       ) : (
+        /* Regular Flat Grid View */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((item) => (
             <ItemCard

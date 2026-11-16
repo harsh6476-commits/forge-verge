@@ -180,8 +180,8 @@ export const MilestonesPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Selected Milestone Detail Inspector (5 cols) */}
-        <div className="lg:col-span-5 sticky top-20">
+        {/* Right: Selected Milestone Detail Inspector (5 cols) with independent scroll */}
+        <div className="lg:col-span-5 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-1 scrollbar-thin">
           {selectedMilestone && (
             <div className="bg-surface border-2 border-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-crisp text-ink">
               <div className="border-b-2 border-border pb-4 space-y-2">

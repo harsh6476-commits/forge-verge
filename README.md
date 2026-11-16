@@ -6,21 +6,31 @@ A focused, personal 18-month engineering learning roadmap and daily execution sy
 
 ## Architecture & Vision
 
-FORGE OS is streamlined into **two core views**:
+FORGE OS is streamlined into **three core views**:
 
 1. **TODAY (`/`)**: Daily command view with two panels:
    - **Left**: Today's topics checklist with categories, completion status, duration, and progress percentage.
-   - **Right**: Selected topic inspector with "What You Will Learn", subtopics checklist, practical tasks, expected outcomes, auto-saving personal study notes, and file/screenshot attachments.
-2. **MILESTONES (`/milestones`)**: A winding vertical progression path inspired by Candy Crush covering 17 outcome-based milestones across all 6 phases of the 18-month curriculum. Shows acceptance criteria, target dates, journey days, and attached projects.
+   - **Right**: Selected topic inspector with "What You Will Learn", subtopics checklist, practical tasks, supporting practice (DSA recall), expected outcomes, auto-saving personal study notes, and file/screenshot attachments.
+   - **Optimistic UI**: Instant 0ms perceived latency on topic/subtopic checkboxes.
+   - **Live Streak & Notifications**: Consecutive habit tracking and browser push notifications for unfinished daily tasks.
+2. **TOPICS (`/topics`)**: Comprehensive 547-item 18-month curriculum catalog:
+   - **Full-Text & Regex Search**: Search across topics, practical tasks, and subtopics.
+   - **Multi-Filter Controls**: Filter by Phase (1–6), Kind (Topic / Checkpoint / Review), Category, and Completion Status.
+   - **Week Grouping View**: Toggle between responsive grid view and Phase/Week grouped view.
+   - **Cursor Pagination**: Smooth cursor-based pagination (24 records per page).
+   - **Detail Drawer**: Slide-out panel with subtopics checklist, practical tasks, supporting practice, research checkpoints, and linked projects with a 1-click "Open Scheduled Day" navigation.
+3. **MILESTONES (`/milestones`)**: A winding vertical progression path inspired by Candy Crush covering 17 outcome-based milestones across all 6 phases:
+   - **Automated Milestone Progression**: Status (`completed`, `current`, `upcoming`) and percentage are derived automatically from mapped topic completions (`completed / total * 100`). Manual completion override is disabled.
+   - **Independent Scroll**: Right-hand inspector panel with independent scrolling for smooth reading of acceptance criteria, core technologies, and personal milestone notes.
 
 ---
 
 ## Tech Stack
 
-- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Lucide React, Canvas Confetti.
+- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, TanStack React Query (caching), Lucide React, Canvas Confetti.
 - **Backend**: Node.js, Express.js, MongoDB Atlas (Mongoose).
 - **Storage**: Cloudinary (with adaptive client-side WebP compression targeting 300–500 KB).
-- **Access Gate**: Private PIN authentication with 1-hour session expiration via secure HttpOnly cookie.
+- **Access Gate**: Private PIN authentication with 1-hour session expiration via secure HttpOnly cookie (fails closed on database unavailability; no hardcoded defaults).
 
 ---
 
@@ -49,11 +59,12 @@ Run both client and server concurrently:
 npm run dev
 ```
 
-Visit [http://localhost:5173](http://localhost:5173). Enter your PIN (default `1234`) to unlock the workspace.
+Visit [http://localhost:5173](http://localhost:5173). Enter your PIN to unlock the workspace.
 
 ### 3. Build & Test
 ```bash
-npm run build    # Strict TypeScript check & Vite production build
-npm test         # Run Vitest test suite
-npm run lint     # Run Oxlint
+npm run typecheck # Strict TypeScript check for both client and server
+npm run build     # Full typecheck + Vite production build
+npm test          # Run Vitest test suite (24 tests)
+npm run lint      # Run Oxlint
 ```
