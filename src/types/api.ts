@@ -18,7 +18,7 @@ export interface Attachment {
 export interface AssignedItem {
   itemId: string;
   title: string;
-  type: 'topic' | 'checkpoint';
+  type: 'topic' | 'checkpoint' | 'review';
   category: string;
   description: string;
   whatYouWillLearn: string[];
@@ -48,16 +48,21 @@ export interface DailyPlan {
 export interface Milestone {
   _id?: string;
   milestoneId: string;
-  phase: number;
   order: number;
+  phase: number;
+  targetWeek: number | null;
+  journeyDay: number;
+  targetDate: string; // YYYY-MM-DD
   title: string;
   tagline: string;
   description: string;
   technologies: string[];
   topicsCovered: string[];
+  acceptanceCriteria: string[];
   status: 'upcoming' | 'current' | 'completed';
-  completedDate?: string;
+  completedDate?: string | null;
   notes: string;
+  projectId?: string | null;
 }
 
 export interface ProgressSummary {

@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../services/api';
 import { Milestone } from '../types/api';
-import { CheckCircle2, Circle, Sparkles, Save } from 'lucide-react';
+import { CheckCircle2, Circle, Sparkles, Save, Calendar, CheckSquare, Layers } from 'lucide-react';
 import { clsx } from 'clsx';
+import { formatShortISTDate } from '../lib/date-utils';
 
 export const MilestonesPage: React.FC = () => {
   const [milestones, setMilestones] = useState<Milestone[]>([]);
@@ -83,14 +84,14 @@ export const MilestonesPage: React.FC = () => {
           Engineering Milestones
         </h1>
         <p className="text-xs sm:text-sm text-black/85 leading-relaxed">
-          Candy Crush-style winding progression across 6 phases. Mark checkpoints complete as you master technologies and build independent projects.
+          17 outcome-based checkpoints across 6 phases. Mark milestones complete as you master core concepts, build independent projects and validate real capabilities.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left: Candy Crush Winding Progression Path (7 cols) */}
         <div className="lg:col-span-7 flex flex-col items-center py-6 relative">
-          {/* Vertical Winding Path Line with zinc-200 contrast */}
+          {/* Vertical Winding Path Line */}
           <div className="absolute top-8 bottom-8 w-1.5 bg-black -z-0" />
 
           <div className="space-y-12 w-full max-w-md z-10">
@@ -127,7 +128,7 @@ export const MilestonesPage: React.FC = () => {
                   >
                     <div className="flex items-center justify-between text-[11px] font-bold mb-1.5">
                       <span className={clsx(isCompleted ? 'text-accent' : isCurrent ? 'text-black' : 'text-black/70')}>
-                        PHASE {m.phase} · #{m.order}
+                        PHASE {m.phase} · {m.milestoneId}
                       </span>
                       {isCompleted && (
                         <span className="text-accent flex items-center gap-1 font-extrabold">
@@ -143,6 +144,12 @@ export const MilestonesPage: React.FC = () => {
 
                     <h3 className="font-extrabold text-sm sm:text-base tracking-wide leading-snug">{m.title}</h3>
                     <p className="text-xs text-black/80 mt-1 line-clamp-1 font-medium">{m.tagline}</p>
+
+                    <div className="pt-2 flex items-center gap-3 text-[10px] text-black/60 font-semibold">
+                      <span>Day {m.journeyDay}</span>
+                      {m.targetWeek && <span>· Week {m.targetWeek}</span>}
+                      <span>· {formatShortISTDate(m.targetDate)}</span>
+                    </div>
                   </div>
 
                   {/* Node Connector Icon */}
@@ -175,51 +182,97 @@ export const MilestonesPage: React.FC = () => {
                   <span className="uppercase bg-accent text-highlight px-3 py-1 rounded-md border-2 border-zinc-200 shadow-crisp-sm">
                     Phase {selectedMilestone.phase} Milestone
                   </span>
-                  <span className="text-black/80 font-bold">#{selectedMilestone.order} of 12</span>
+                  <span className="text-black/80 font-bold">
+                    #{selectedMilestone.order} of {milestones.length}
+                  </span>
                 </div>
 
                 <h2 className="text-xl sm:text-2xl font-extrabold tracking-wide leading-snug pt-1">
                   {selectedMilestone.title}
                 </h2>
+                {selectedMilestone.tagline && (
+                  <p className="text-xs font-semibold text-accent italic">
+                    "{selectedMilestone.tagline}"
+                  </p>
+                )}
                 <p className="text-xs sm:text-sm text-black/85 leading-relaxed pt-1">
                   {selectedMilestone.description}
                 </p>
-              </div>
 
-              {/* Technologies */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent">
-                  Core Technologies
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {selectedMilestone.technologies.map((t) => (
-                    <span
-                      key={t}
-                      className="text-xs font-bold px-3 py-1 rounded-lg bg-canvas border-2 border-zinc-200 text-black shadow-crisp-sm"
-                    >
-                      {t}
+                {/* Target Metadata Bar */}
+                <div className="pt-2 flex flex-wrap items-center gap-3 text-xs font-bold text-black/75">
+                  <span className="inline-flex items-center gap-1.5 bg-canvas px-2.5 py-1 rounded-lg border border-zinc-300">
+                    <Calendar className="w-3.5 h-3.5 text-accent" />
+                    Target: {formatShortISTDate(selectedMilestone.targetDate)}
+                  </span>
+                  <span className="bg-canvas px-2.5 py-1 rounded-lg border border-zinc-300">
+                    Day {selectedMilestone.journeyDay} {selectedMilestone.targetWeek ? `· Week ${selectedMilestone.targetWeek}` : ''}
+                  </span>
+                  {selectedMilestone.projectId && (
+                    <span className="inline-flex items-center gap-1 bg-accent/15 text-accent px-2.5 py-1 rounded-lg border border-accent/30">
+                      <Layers className="w-3.5 h-3.5" />
+                      Project {selectedMilestone.projectId}
                     </span>
-                  ))}
+                  )}
                 </div>
               </div>
 
+              {/* Acceptance Criteria */}
+              {selectedMilestone.acceptanceCriteria && selectedMilestone.acceptanceCriteria.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent flex items-center gap-1.5">
+                    <CheckSquare className="w-4 h-4" />
+                    Acceptance Criteria
+                  </h4>
+                  <ul className="text-xs sm:text-sm text-black space-y-2 bg-canvas/60 p-4 sm:p-5 rounded-2xl border-2 border-zinc-200 leading-relaxed font-medium shadow-crisp-sm">
+                    {selectedMilestone.acceptanceCriteria.map((criterion, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="text-accent font-bold">✓</span>
+                        <span>{criterion}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Technologies */}
+              {selectedMilestone.technologies && selectedMilestone.technologies.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent">
+                    Core Technologies
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedMilestone.technologies.map((t) => (
+                      <span
+                        key={t}
+                        className="text-xs font-bold px-3 py-1 rounded-lg bg-canvas border-2 border-zinc-200 text-black shadow-crisp-sm"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Topics Covered */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent">
-                  Curriculum Focus
-                </h4>
-                <ul className="text-xs sm:text-sm text-black space-y-2 list-disc list-inside bg-canvas/60 p-4 sm:p-5 rounded-2xl border-2 border-zinc-200 leading-relaxed font-medium shadow-crisp-sm">
-                  {selectedMilestone.topicsCovered.map((topic, i) => (
-                    <li key={i}>{topic}</li>
-                  ))}
-                </ul>
-              </div>
+              {selectedMilestone.topicsCovered && selectedMilestone.topicsCovered.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent">
+                    Curriculum Focus
+                  </h4>
+                  <ul className="text-xs sm:text-sm text-black space-y-1.5 list-disc list-inside bg-canvas/60 p-4 rounded-2xl border-2 border-zinc-200 leading-relaxed font-medium shadow-crisp-sm">
+                    {selectedMilestone.topicsCovered.map((topic, i) => (
+                      <li key={i}>{topic}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Milestone Personal Notes */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent">
-                    Milestone Notes & Takeaways
+                    Milestone Notes & Artifacts
                   </h4>
                   <button
                     onClick={handleSaveNotes}
@@ -231,10 +284,10 @@ export const MilestonesPage: React.FC = () => {
                   </button>
                 </div>
                 <textarea
-                  rows={4}
+                  rows={3}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Record summary notes or repository links for this milestone..."
+                  placeholder="Record verification notes, PR links or repository URLs for this milestone..."
                   className="w-full bg-white border-2 border-zinc-200 focus:border-black rounded-2xl p-4 text-xs sm:text-sm text-black outline-none resize-y font-mono shadow-crisp-sm leading-relaxed"
                 />
               </div>
@@ -253,7 +306,7 @@ export const MilestonesPage: React.FC = () => {
                   {selectedMilestone.status === 'completed' ? (
                     <>
                       <CheckCircle2 className="w-4 h-4 text-accent" />
-                      <span>COMPLETED · MARK INCOMPLETE</span>
+                      <span>COMPLETED · CLICK TO REOPEN</span>
                     </>
                   ) : (
                     <>

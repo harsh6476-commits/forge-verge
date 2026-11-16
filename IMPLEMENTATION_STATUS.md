@@ -1,78 +1,74 @@
-# IMPLEMENTATION STATUS — FORGE OS (REBUILT)
+# IMPLEMENTATION STATUS — FORGE OS (18-MONTH CURRICULUM APPLIED)
 
-**Current Status:** Rebuilt & Production Ready
-**Architecture:** 2-Page Linear Engineering System (`Today` & `Milestones`) with Node.js/Express + MongoDB Atlas Backend & PIN Access Gate
-**Date:** 2026-11-16 (Asia/Kolkata)
-**Vite Build & TypeScript Compilation:** PASSED (0 Errors)
-**Vitest Unit Tests:** 5/5 PASSED
-**Oxlint Linter:** 0 Errors
+**Current Status:** Rebuilt & 18-Month Curriculum Integrated  
+**Architecture:** Exactly 2 Pages (`Today` & `Milestones`) with Node.js/Express + MongoDB Atlas Backend & PIN Access Gate  
+**Curriculum Scope:** 6 Phases, 78 Weeks, 546 Dated Days (`2026-11-16` to `2028-05-14`) + Day 547 Final Showcase (`2028-05-15`), 17 Outcome-Based Milestones, 7 Projects, 18 Research Checkpoints  
+**Design Theme:** Custom Retro-Tech — `#A5A79B` Canvas, `#E8D2B5` Highlight, `#590907` Accent, Universal JetBrains Mono font, Crisp Shadows, Zinc-200 Outlines  
+**Date:** 2026-11-16 (Asia/Kolkata)  
+**Vite Build & TypeScript Compilation:** PASSED (0 Errors)  
+**Vitest Unit Tests:** 10/10 PASSED  
+**Oxlint Linter:** 0 Errors  
 
 ---
 
-## 1. Architectural Transformation Completed
+## 1. Scope & Architecture Boundaries Enforced
 
-### Streamlined into Exactly Two Pages
+### Strictly Two Main Pages
 - [x] **Page 1: TODAY (`/`)**:
   - Daily summary header (Journey Day, Phase, Week, Date in Asia/Kolkata, Streak count, Progress bar).
+  - Date browsing navigation (`Previous Day`, `Today`, `Next Day`) ensuring historical records and future days remain accessible.
   - Two-panel layout:
     - **Left**: Today's topics checklist with category tag, completion status, duration, and progress percentage.
     - **Right**: Selected topic inspector (Title, What You Will Learn, Subtopic checklist with explanations, practical task & expected outcome, debounced auto-saving personal notes, and attachment upload/preview).
-  - Date browsing navigation (`Previous Day`, `Today`, `Next Day`) ensuring historical records remain preserved.
-  - Automatic parent topic completion when all subtopics are completed, plus manual override.
-  - "Next Topic" advancement button for continuous flow.
+  - Parent topic completion derived from subtopic completion, plus manual override.
   - Confetti celebration upon 100% daily plan completion.
-
 - [x] **Page 2: MILESTONES (`/milestones`)**:
-  - Vertical winding path inspired by Candy Crush alternating left and right across 12 major checkpoints and 6 phases.
-  - Three distinct visual states: **Completed** (teal checkmark), **Current Focus** (cyan pulsing ring), and **Upcoming** (muted).
-  - Auto-scroll to current active milestone on mount.
-  - Selected milestone inspector with core technologies, curriculum topics covered, personal takeaways/notes, and manual completion toggle.
-
-### Access Gate (Simple Personal PIN)
-- [x] Unlocks with configured `APP_ACCESS_PIN` in `.env` (defaults to `1234`).
-- [x] Opaque random session token stored server-side in MongoDB `AccessSession` with an exact 1-hour expiration.
-- [x] Transmitted via secure `HttpOnly` cookie (`forge_access`).
-- [x] Brute-force rate limiting: 5 failed attempts trigger a 5-minute lockout.
-- [x] Manual lock button in top navigation.
-- [x] Browser refresh preserves active 1-hour sessions without re-prompting.
-
-### Backend & Database Architecture
-- [x] Express.js server (`server/index.ts`) running on port 5000 with credential-compatible CORS.
-- [x] Mongoose models:
-  - `AccessSession`: Hashed token, expiresAt TTL index.
-  - `CurriculumItem`: Reusable curriculum items across Phase 1 to 6.
-  - `DailyPlan`: Date-specific plan, journeyDay, assigned items, subtopics, notes, attachments, completion status.
-  - `Milestone`: 12 winding progression milestones across all 6 phases.
-  - `Notification`: In-app notification center.
-- [x] Idempotent curriculum and milestone seeders (`server/services/curriculumService.ts`).
-- [x] Cloudinary integration (`server/controllers/attachmentsController.ts`) with adaptive WebP image compression (`src/lib/imageCompression.ts`) targeting 300–500 KB while preserving code screenshot readability.
-
-### Clean Removal of Deprecated Modules
-- [x] Removed sidebar navigation and multi-page bloat.
-- [x] Removed Academic Manager and Examination mode.
-- [x] Removed Market Radar, Career OS, and separate Skill Matrix.
-- [x] Removed separate DSA Lab, separate Visual Tutor, separate Engineering Journal, and separate Projects dashboard.
-- [x] Removed proof verification, verification levels, GitHub token requirements, and Supabase auth.
-- [x] Consolidated all DSA, JavaScript, React, Backend, Database, and Core CS content directly into daily curriculum topics and milestones.
+  - Vertical winding path inspired by Candy Crush alternating left and right across all 17 outcome-based checkpoints and 6 phases.
+  - Visual states: **Completed** (accent checkmark), **Current Focus** (pulsing accent ring), and **Upcoming** (muted highlight).
+  - Auto-scrolls to first incomplete (`current`) milestone on load.
+  - Selected milestone inspector with target date, target week, journey day, project connection, core technologies, curriculum focus, measurable acceptance criteria checklist, personal notes, and manual completion toggle.
+- [x] **No Third Navigation Route**: Removed `/daily-list` route, deleted `DailyListPage.tsx`, and removed `DAILY LIST` link from navigation. All historical and future day browsing remains embedded within Today.
 
 ---
 
-## 2. Verification & Automated Test Results
-- `npm run build`: **PASSED** (0 TypeScript errors).
-- `npm test` (`vitest run`): **PASSED** (5/5 tests passing).
-- `server/index.ts` startup test: **PASSED** (Listens on port 5000, proxies requests from Vite dev server on port 5173).
+## 2. 18-Month Curriculum Engine
+
+### JSON Data Ingestion (`server/data/FORGE_OS_18_MONTH_CURRICULUM.json`)
+- [x] **547 Total Dates Mapped**:
+  - 546 regular roadmap days (6 phases × 13 weeks = 78 weeks × 7 days) spanning `2026-11-16` to `2028-05-14`.
+  - Day 547 (`2028-05-15`): Special final engineering showcase and portfolio walkthrough.
+- [x] **Cadence Structure Preserved**:
+  - Days 1–5: Single focused topic with actual subtopics, learning objectives, practical task, expected outcome, and duration.
+  - Day 6: Checkpoint / lab practical synthesis.
+  - Day 7: Weekly review and catch-up (active recall, delayed DSA re-solve, backlog clean-up).
+- [x] **17 Outcome-Based Milestones (`M01` to `M17`)**:
+  - Seeded idempotently with `order` (1–17), `phase` (1–6), `targetWeek`, `journeyDay`, `targetDate`, `technologies`, `topicsCovered`, and `acceptanceCriteria`.
+  - M01 starts as `current`; all others start `upcoming`.
+  - Idempotent upsert preserves user notes, completion status, and timestamps without overwrite.
+- [x] **7 Projects & 18 Research Checkpoints**:
+  - Embedded directly as curriculum metadata and milestone associations (e.g. `P01` Browser API Lab, `P02` Resource API Explorer, `P03` E-commerce Backend V1, etc.).
 
 ---
 
-## 3. How to Run FORGE OS
+## 3. Automated Test & Build Verification
 
-1. Copy `.env.example` to `.env` and configure your keys:
+- `npm run build` (`tsc -b && vite build`): **PASSED** (0 TypeScript errors).
+- `npm test` (`vitest run`): **PASSED** (10/10 tests passing across date calculations and curriculum integrity).
+- `npm run lint` (`oxlint`): **PASSED** (0 errors).
+
+---
+
+## 4. How to Run FORGE OS
+
+1. Ensure `.env` is configured with `MONGODB_URI` and optional Cloudinary credentials:
    ```bash
-   cp .env.example .env
+   PORT=5000
+   MONGODB_URI=mongodb+srv://...
+   APP_ACCESS_PIN=1234
    ```
 2. Start both server and client concurrently:
    ```bash
    npm run dev
    ```
 3. Open `http://localhost:5173` in your browser.
-4. Enter your PIN (default: `1234`) to unlock your personal workspace.
+4. Enter PIN (`1234`) to unlock your personal 18-month engineering cockpit.

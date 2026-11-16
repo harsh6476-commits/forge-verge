@@ -4,7 +4,6 @@ import { api } from './services/api';
 import { PinGate } from './components/PinGate';
 import { TopNav } from './components/TopNav';
 import { TodayPage } from './pages/Today';
-import { DailyListPage } from './pages/DailyListPage';
 import { MilestonesPage } from './pages/Milestones';
 import { AppNotification } from './types/api';
 
@@ -82,11 +81,10 @@ export function App() {
           onMarkRead={handleMarkNotificationRead}
         />
 
-        {/* 3 Main Pages: Today, Daily List, Milestones */}
+        {/* 2 Main Pages: Today and Milestones */}
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<TodayPage />} />
-            <Route path="/daily-list" element={<DailyListPage />} />
             <Route path="/milestones" element={<MilestonesPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

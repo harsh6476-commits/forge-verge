@@ -11,7 +11,7 @@ FORGE OS is streamlined into **two core views**:
 1. **TODAY (`/`)**: Daily command view with two panels:
    - **Left**: Today's topics checklist with categories, completion status, duration, and progress percentage.
    - **Right**: Selected topic inspector with "What You Will Learn", subtopics checklist, practical tasks, expected outcomes, auto-saving personal study notes, and file/screenshot attachments.
-2. **MILESTONES (`/milestones`)**: A winding vertical progression path inspired by Candy Crush covering 12 major milestones across all 6 phases of the 18-month curriculum.
+2. **MILESTONES (`/milestones`)**: A winding vertical progression path inspired by Candy Crush covering 17 outcome-based milestones across all 6 phases of the 18-month curriculum. Shows acceptance criteria, target dates, journey days, and attached projects.
 
 ---
 

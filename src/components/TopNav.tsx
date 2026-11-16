@@ -35,7 +35,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           </span>
         </div>
 
-        {/* 3 Main Pages: TODAY, DAILY LIST, MILESTONES */}
+        {/* 2 Main Pages: TODAY, MILESTONES */}
         <nav className="flex items-center gap-2 sm:gap-3 text-xs">
           <NavLink
             to="/"
@@ -50,20 +50,6 @@ export const TopNav: React.FC<TopNavProps> = ({
             }
           >
             TODAY
-          </NavLink>
-
-          <NavLink
-            to="/daily-list"
-            className={({ isActive }) =>
-              clsx(
-                'px-4 py-2 rounded-xl font-bold transition-all border-2 border-zinc-200 shadow-crisp-sm tracking-wider',
-                isActive
-                  ? 'bg-accent text-highlight border-black shadow-crisp'
-                  : 'bg-highlight text-black hover:bg-white'
-              )
-            }
-          >
-            DAILY LIST
           </NavLink>
 
           <NavLink

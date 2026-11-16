@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IAssignedItem {
   itemId: string;
   title: string;
-  type: 'topic' | 'checkpoint';
+  type: 'topic' | 'checkpoint' | 'review';
   category: string;
   description: string;
   whatYouWillLearn: string[];
@@ -47,7 +47,7 @@ export interface IDailyPlan extends Document {
 const AssignedItemSchema = new Schema({
   itemId: { type: String, required: true },
   title: { type: String, required: true },
-  type: { type: String, enum: ['topic', 'checkpoint'], default: 'topic' },
+  type: { type: String, enum: ['topic', 'checkpoint', 'review'], default: 'topic' },
   category: { type: String, required: true },
   description: { type: String, default: '' },
   whatYouWillLearn: [{ type: String }],

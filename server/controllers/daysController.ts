@@ -24,25 +24,6 @@ export async function getPlanByDate(req: Request, res: Response): Promise<void> 
   }
 }
 
-/**
- * Returns rolling list of plans for the Daily List view
- */
-export async function getDailyList(_req: Request, res: Response): Promise<void> {
-  try {
-    const todayStr = formatISTDate();
-    // Pre-generate rolling 30 days starting from today (or roadmap start)
-    const days: any[] = [];
-    for (let i = 0; i < 30; i++) {
-      const dateStr = addDaysToDateStr(todayStr, i);
-      const plan = await getOrCreateDailyPlan(dateStr);
-      days.push(plan);
-    }
-    res.json(days);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message || 'Error fetching daily list' });
-  }
-}
-
 export async function updateItemCompletion(req: Request, res: Response): Promise<void> {
   const { date, itemId } = req.params;
   const { completed } = req.body;
