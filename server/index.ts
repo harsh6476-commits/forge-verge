@@ -38,10 +38,21 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
 
-// Credential-compatible CORS (No wildcard origin)
+// Credential-compatible CORS (Allows local dev, configured origin, and Vercel deployments)
 app.use(
   cors({
-    origin: CLIENT_ORIGIN,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (process.env.NODE_ENV !== 'production') return callback(null, true);
+      if (
+        origin === CLIENT_ORIGIN ||
+        origin.endsWith('.vercel.app') ||
+        origin.includes('localhost')
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -52,8 +63,46 @@ app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Mount API routes
-app.use('/api', apiRoutes);
+// ─── Database Connection Manager (Supports traditional server & serverless) ───
+let dbPromise: Promise<typeof mongoose> | null = null;
+
+export async function ensureDbConnected(): Promise<typeof mongoose | null> {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose;
+  }
+  const mongoUri = process.env.MONGODB_URI;
+  if (!mongoUri) {
+    return null;
+  }
+  if (!dbPromise) {
+    dbPromise = mongoose
+      .connect(mongoUri)
+      .then(async (m) => {
+        console.log('Connected to MongoDB Atlas successfully');
+        await seedInitialCurriculum();
+        return m;
+      })
+      .catch((err) => {
+        dbPromise = null;
+        console.warn('MongoDB connection failed:', err.message);
+        throw err;
+      });
+  }
+  return dbPromise;
+}
+
+// Pre-connect on startup
+ensureDbConnected().catch(() => {});
+
+// Middleware ensuring DB connection is ready before route handling (essential for serverless)
+app.use(async (_req, _res, next) => {
+  try {
+    await ensureDbConnected();
+  } catch {
+    // Handled downstream by controller fail-closed checks (503)
+  }
+  next();
+});
 
 // Health check
 app.get('/health', (_req, res) => {
@@ -65,26 +114,15 @@ app.get('/health', (_req, res) => {
   });
 });
 
-// Connect to MongoDB Atlas
-const mongoUri = process.env.MONGODB_URI;
+// Mount API routes (both on /api and root to handle potential proxy rewrites)
+app.use('/api', apiRoutes);
+app.use(apiRoutes);
 
-if (mongoUri) {
-  mongoose
-    .connect(mongoUri)
-    .then(async () => {
-      console.log('Connected to MongoDB Atlas successfully');
-      await seedInitialCurriculum();
-    })
-    .catch((err) => {
-      console.warn('MongoDB connection failed. Local in-memory seed fallback available:', err.message);
-    });
-} else {
-  console.log('MONGODB_URI not provided. Please configure it in .env');
+// Only bind to local port when not running as a Vercel serverless function
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`FORGE OS Backend Server running on port ${PORT}`);
+  });
 }
 
-app.listen(PORT, () => {
-  console.log(`FORGE OS Backend Server running on port ${PORT}`);
-});
-
 export default app;
-

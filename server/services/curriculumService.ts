@@ -79,8 +79,10 @@ export function loadCurriculumData(): {
     };
   }
 
+  const dir = typeof import.meta.dirname === 'string' ? import.meta.dirname : process.cwd();
   const possiblePaths = [
     path.resolve(process.cwd(), 'server/data/FORGE_OS_18_MONTH_CURRICULUM_V1_1.json'),
+    path.resolve(dir, '../data/FORGE_OS_18_MONTH_CURRICULUM_V1_1.json'),
     path.resolve(process.cwd(), 'server/data/FORGE_OS_18_MONTH_CURRICULUM.json'),
   ];
 
