@@ -31,14 +31,14 @@
   --color-canvas: #09090B;        /* zinc-950 */
   --color-surface: #18181B;       /* zinc-900 */
   --color-surface-muted: #27272A; /* zinc-800 */
-  --color-surface-bright: #3F3F46;/* zinc-700 */
+  --color-surface-bright: #2e2e2e;/* zinc-700 */
   --color-ink: #F4F4F5;           /* zinc-100 */
   --color-ink-muted: #A1A1AA;     /* zinc-400 */
-  --color-accent: #3F3F46;        /* zinc-700 accent or dark contrast */
-  --color-accent-hover: #52525B;  /* zinc-600 */
+  --color-accent: #14402a;        /* zinc-700 accent or dark contrast */
+  --color-accent-hover: #053a2a;  /* zinc-600 */
   --color-accent-fg: #FFFFFF;
   --color-border: #3F3F46;        /* zinc-700 */
-  --color-focus: #71717A;         /* zinc-500 */
+  --color-focus: #b86a2e;         /* zinc-500 */
   --shadow-crisp: 3px 3px 0px 0px rgba(0, 0, 0, 0.95);
   --shadow-crisp-lg: 5px 5px 0px 0px rgba(0, 0, 0, 0.95);
   --shadow-crisp-sm: 2px 2px 0px 0px rgba(0, 0, 0, 0.85);

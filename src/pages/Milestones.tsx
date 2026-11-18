@@ -5,6 +5,166 @@ import { CheckCircle2, Sparkles, Save, Calendar, CheckSquare, Layers, Lock } fro
 import { clsx } from 'clsx';
 import { formatShortISTDate } from '../lib/date-utils';
 
+interface MilestoneDetailsProps {
+  milestone: Milestone;
+  milestoneCount: number;
+  notes: string;
+  savingNotes: boolean;
+  onNotesChange: (notes: string) => void;
+  onSaveNotes: () => void;
+}
+
+const MilestoneDetails: React.FC<MilestoneDetailsProps> = ({
+  milestone,
+  milestoneCount,
+  notes,
+  savingNotes,
+  onNotesChange,
+  onSaveNotes,
+}) => (
+  <div className="min-w-0 bg-surface border-2 border-border rounded-2xl sm:rounded-3xl p-4 sm:p-8 space-y-5 sm:space-y-6 shadow-crisp text-ink">
+    <div className="min-w-0 border-b-2 border-border pb-4 space-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono font-bold tracking-wider">
+        <span className="uppercase bg-accent text-white px-3 py-1 rounded-md border border-accent shadow-crisp-sm">
+          Phase {milestone.phase} Milestone
+        </span>
+        <span className="text-ink-muted font-bold">
+          #{milestone.order} of {milestoneCount}
+        </span>
+      </div>
+
+      <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug pt-1 text-ink">
+        {milestone.title}
+      </h2>
+      {milestone.tagline && (
+        <p className="text-xs font-semibold text-accent italic">"{milestone.tagline}"</p>
+      )}
+      <p className="text-xs sm:text-sm text-ink-muted leading-relaxed pt-1">
+        {milestone.description}
+      </p>
+
+      <div className="pt-2 p-3 bg-surface-muted rounded-xl border border-border space-y-1.5 font-mono">
+        <div className="flex justify-between text-xs font-bold text-ink">
+          <span>Automated Progress</span>
+          <span>{milestone.progressPct || 0}%</span>
+        </div>
+        <div className="w-full bg-surface-bright rounded-full h-2 overflow-hidden border border-border">
+          <div
+            className={clsx(
+              'h-full rounded-full transition-all',
+              milestone.status === 'completed' ? 'bg-accent' : 'bg-focus'
+            )}
+            style={{ width: `${milestone.progressPct || 0}%` }}
+          />
+        </div>
+        <div className="text-[11px] text-ink-muted flex flex-wrap justify-between gap-x-2 gap-y-1 pt-0.5">
+          <span>
+            {milestone.completedItemCount || 0} / {milestone.requiredItemCount ?? milestone.requiredItemIds?.length ?? 0} topics completed
+          </span>
+          <span className="capitalize font-bold text-accent">{milestone.status}</span>
+        </div>
+      </div>
+
+      <div className="pt-2 flex flex-wrap items-center gap-2 text-xs font-mono font-bold text-ink-muted">
+        <span className="inline-flex items-center gap-1.5 bg-surface-muted px-2.5 py-1 rounded-lg border border-border">
+          <Calendar className="w-3.5 h-3.5 text-accent" />
+          Target: {formatShortISTDate(milestone.targetDate)}
+        </span>
+        <span className="bg-surface-muted px-2.5 py-1 rounded-lg border border-border">
+          Day {milestone.startJourneyDay || milestone.journeyDay}
+          {milestone.endJourneyDay && milestone.endJourneyDay !== milestone.startJourneyDay
+            ? `–${milestone.endJourneyDay}`
+            : ''}
+        </span>
+        {milestone.projectId && (
+          <span className="inline-flex items-center gap-1 bg-accent/15 text-accent px-2.5 py-1 rounded-lg border border-accent/30">
+            <Layers className="w-3.5 h-3.5" />
+            Project {milestone.projectId}
+          </span>
+        )}
+      </div>
+    </div>
+
+    {milestone.acceptanceCriteria && milestone.acceptanceCriteria.length > 0 && (
+      <div className="space-y-2">
+        <h4 className="text-xs font-mono font-extrabold uppercase tracking-widest text-accent flex items-center gap-1.5">
+          <CheckSquare className="w-4 h-4" />
+          Acceptance Criteria
+        </h4>
+        <ul className="text-xs sm:text-sm text-ink space-y-2 bg-surface-muted p-4 sm:p-5 rounded-2xl border border-border leading-relaxed font-medium shadow-crisp-sm">
+          {milestone.acceptanceCriteria.map((criterion, index) => (
+            <li key={index} className="flex min-w-0 items-start gap-2">
+              <span className="text-accent font-bold">✓</span>
+              <span className="min-w-0 break-words">{criterion}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {milestone.technologies && milestone.technologies.length > 0 && (
+      <div className="space-y-2">
+        <h4 className="text-xs font-mono font-extrabold uppercase tracking-widest text-accent">
+          Core Technologies
+        </h4>
+        <div className="flex flex-wrap gap-2">
+          {milestone.technologies.map((technology) => (
+            <span
+              key={technology}
+              className="text-xs font-mono font-bold px-3 py-1 rounded-lg bg-surface-muted border border-border text-ink shadow-crisp-sm"
+            >
+              {technology}
+            </span>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {milestone.topicsCovered && milestone.topicsCovered.length > 0 && (
+      <div className="space-y-2">
+        <h4 className="text-xs font-mono font-extrabold uppercase tracking-widest text-accent">
+          Curriculum Focus
+        </h4>
+        <ul className="text-xs sm:text-sm text-ink space-y-1.5 list-disc list-inside bg-surface-muted p-4 rounded-2xl border border-border leading-relaxed font-medium shadow-crisp-sm break-words">
+          {milestone.topicsCovered.map((topic, index) => (
+            <li key={index}>{topic}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 font-mono">
+        <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent">
+          Milestone Notes & Artifacts
+        </h4>
+        <button
+          onClick={onSaveNotes}
+          disabled={savingNotes}
+          className="text-xs font-bold text-accent hover:underline flex items-center gap-1.5"
+        >
+          <Save className="w-3.5 h-3.5" />
+          <span>{savingNotes ? 'Saving...' : 'Save Notes'}</span>
+        </button>
+      </div>
+      <textarea
+        rows={3}
+        value={notes}
+        onChange={(event) => onNotesChange(event.target.value)}
+        placeholder="Record verification notes, PR links or repository URLs for this milestone..."
+        className="w-full bg-surface-bright border-2 border-border focus:border-accent rounded-2xl p-4 text-xs sm:text-sm text-ink outline-none resize-y font-mono shadow-crisp-sm leading-relaxed"
+      />
+    </div>
+
+    <div className="pt-2 border-t-2 border-border flex items-center gap-2 text-xs font-mono text-ink-muted">
+      <Lock className="w-4 h-4 text-accent shrink-0" />
+      <span>
+        Milestone status is automated from topic completions. Manual override is disabled.
+      </span>
+    </div>
+  </div>
+);
+
 export const MilestonesPage: React.FC = () => {
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
@@ -35,7 +195,7 @@ export const MilestonesPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (currentRef.current) {
+    if (window.matchMedia('(min-width: 1024px)').matches && currentRef.current) {
       currentRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [loading]);
@@ -63,14 +223,14 @@ export const MilestonesPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 sm:px-8 py-8 space-y-8 font-sans text-ink">
+    <div className="w-full min-w-0 max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-5 sm:space-y-8 font-sans text-ink">
       {/* Header */}
-      <div className="text-center max-w-xl mx-auto space-y-3 bg-surface border-2 border-border rounded-3xl p-6 sm:p-8 shadow-crisp">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-accent text-white text-xs font-mono font-extrabold uppercase tracking-widest border border-accent">
+      <div className="text-center max-w-xl mx-auto space-y-3 bg-surface border-2 border-border rounded-3xl p-4 sm:p-8 shadow-crisp">
+        <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-md bg-accent text-white text-[10px] sm:text-xs font-mono font-extrabold uppercase tracking-widest border border-accent">
           <Sparkles className="w-4 h-4" />
           <span>18-Month Progression Path</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase text-ink">
+        <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight uppercase text-ink">
           Engineering Milestones
         </h1>
         <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
@@ -78,13 +238,13 @@ export const MilestonesPage: React.FC = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid min-w-0 grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 items-start">
         {/* Left: Candy Crush Winding Progression Path (7 cols) */}
-        <div className="lg:col-span-7 flex flex-col items-center py-6 relative">
+        <div className="order-1 min-w-0 lg:col-span-7 flex flex-col items-center py-4 sm:py-6 relative">
           {/* Vertical Winding Path Line */}
-          <div className="absolute top-8 bottom-8 w-1.5 bg-border -z-0" />
+          <div className="absolute top-8 bottom-8 w-1.5 bg-border -z-0 hidden sm:block" />
 
-          <div className="space-y-12 w-full max-w-md z-10">
+          <div className="space-y-8 sm:space-y-12 w-full max-w-md z-10">
             {milestones.map((m, index) => {
               const isEven = index % 2 === 0;
               const isCurrent = m.status === 'current';
@@ -95,22 +255,22 @@ export const MilestonesPage: React.FC = () => {
               const compCount = m.completedItemCount || 0;
 
               return (
-                <div
-                  key={m.milestoneId}
-                  ref={isCurrent ? currentRef : undefined}
-                  onClick={() => {
-                    setSelectedMilestone(m);
-                    setNotes(m.notes || '');
-                  }}
-                  className={clsx(
-                    'flex items-center gap-5 transition-transform cursor-pointer',
-                    isEven ? 'flex-row' : 'flex-row-reverse text-right'
-                  )}
-                >
+                <div key={m.milestoneId} className="space-y-4 sm:space-y-6">
+                  <div
+                    ref={isCurrent ? currentRef : undefined}
+                    onClick={() => {
+                      setSelectedMilestone(m);
+                      setNotes(m.notes || '');
+                    }}
+                    className={clsx(
+                      'flex items-center gap-2 sm:gap-5 transition-transform cursor-pointer min-w-0',
+                      isEven ? 'flex-row' : 'flex-row-reverse text-right'
+                    )}
+                  >
                   {/* Milestone Card */}
                   <div
                     className={clsx(
-                      'flex-1 p-5 rounded-3xl border-2 transition-all text-xs space-y-2',
+                      'min-w-0 flex-1 p-3 sm:p-5 rounded-2xl sm:rounded-3xl border-2 transition-all text-xs space-y-2',
                       isSelected ? 'ring-2 ring-accent shadow-crisp-lg border-border' : 'border-border shadow-crisp',
                       isCompleted
                         ? 'bg-surface text-ink'
@@ -119,7 +279,7 @@ export const MilestonesPage: React.FC = () => {
                         : 'bg-surface/90 text-ink-muted hover:bg-surface hover:text-ink'
                     )}
                   >
-                    <div className="flex items-center justify-between text-[11px] font-mono font-bold mb-1">
+                    <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[10px] sm:text-[11px] font-mono font-bold mb-1">
                       <span className={clsx(isCompleted ? 'text-accent' : isCurrent ? 'text-focus' : 'text-ink-muted')}>
                         PHASE {m.phase} · {m.milestoneId}
                       </span>
@@ -152,7 +312,7 @@ export const MilestonesPage: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="pt-1 flex items-center gap-2 text-[10px] font-mono text-ink-muted font-semibold">
+                    <div className="pt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-mono text-ink-muted font-semibold">
                       <span>Day {m.startJourneyDay || m.journeyDay}{m.endJourneyDay && m.endJourneyDay !== m.startJourneyDay ? `–${m.endJourneyDay}` : ''}</span>
                       {m.targetWeek && <span>· W{m.targetWeek}</span>}
                       <span>· {formatShortISTDate(m.targetDate)}</span>
@@ -162,7 +322,7 @@ export const MilestonesPage: React.FC = () => {
                   {/* Node Connector Icon */}
                   <div
                     className={clsx(
-                      'w-14 h-14 rounded-2xl border-2 border-border flex items-center justify-center shrink-0 font-mono font-extrabold text-base transition-all shadow-crisp',
+                      'w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl border-2 border-border flex items-center justify-center shrink-0 font-mono font-extrabold text-sm sm:text-base transition-all shadow-crisp',
                       isCompleted
                         ? 'bg-accent text-white border-accent'
                         : isCurrent
@@ -174,6 +334,19 @@ export const MilestonesPage: React.FC = () => {
                   </div>
 
                   <div className="flex-1 hidden sm:block" />
+                  </div>
+                  {isSelected && (
+                    <div className="lg:hidden">
+                      <MilestoneDetails
+                        milestone={m}
+                        milestoneCount={milestones.length}
+                        notes={notes}
+                        savingNotes={savingNotes}
+                        onNotesChange={setNotes}
+                        onSaveNotes={handleSaveNotes}
+                      />
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -181,158 +354,16 @@ export const MilestonesPage: React.FC = () => {
         </div>
 
         {/* Right: Selected Milestone Detail Inspector (5 cols) with independent scroll */}
-        <div className="lg:col-span-5 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-1 scrollbar-thin">
+        <div className="hidden lg:block min-w-0 lg:col-span-5 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1 scrollbar-thin">
           {selectedMilestone && (
-            <div className="bg-surface border-2 border-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-crisp text-ink">
-              <div className="border-b-2 border-border pb-4 space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono font-bold tracking-wider">
-                  <span className="uppercase bg-accent text-white px-3 py-1 rounded-md border border-accent shadow-crisp-sm">
-                    Phase {selectedMilestone.phase} Milestone
-                  </span>
-                  <span className="text-ink-muted font-bold">
-                    #{selectedMilestone.order} of {milestones.length}
-                  </span>
-                </div>
-
-                <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug pt-1 text-ink">
-                  {selectedMilestone.title}
-                </h2>
-                {selectedMilestone.tagline && (
-                  <p className="text-xs font-semibold text-accent italic">
-                    "{selectedMilestone.tagline}"
-                  </p>
-                )}
-                <p className="text-xs sm:text-sm text-ink-muted leading-relaxed pt-1">
-                  {selectedMilestone.description}
-                </p>
-
-                {/* Progress Status Bar */}
-                <div className="pt-2 p-3 bg-surface-muted rounded-xl border border-border space-y-1.5 font-mono">
-                  <div className="flex justify-between text-xs font-bold text-ink">
-                    <span>Automated Progress</span>
-                    <span>{selectedMilestone.progressPct || 0}%</span>
-                  </div>
-                  <div className="w-full bg-surface-bright rounded-full h-2 overflow-hidden border border-border">
-                    <div
-                      className={clsx(
-                        'h-full rounded-full transition-all',
-                        selectedMilestone.status === 'completed' ? 'bg-accent' : 'bg-focus'
-                      )}
-                      style={{ width: `${selectedMilestone.progressPct || 0}%` }}
-                    />
-                  </div>
-                  <div className="text-[11px] text-ink-muted flex justify-between pt-0.5">
-                    <span>
-                      {selectedMilestone.completedItemCount || 0} / {selectedMilestone.requiredItemCount ?? selectedMilestone.requiredItemIds?.length ?? 0} topics completed
-                    </span>
-                    <span className="capitalize font-bold text-accent">{selectedMilestone.status}</span>
-                  </div>
-                </div>
-
-                {/* Target Metadata Bar */}
-                <div className="pt-2 flex flex-wrap items-center gap-2 text-xs font-mono font-bold text-ink-muted">
-                  <span className="inline-flex items-center gap-1.5 bg-surface-muted px-2.5 py-1 rounded-lg border border-border">
-                    <Calendar className="w-3.5 h-3.5 text-accent" />
-                    Target: {formatShortISTDate(selectedMilestone.targetDate)}
-                  </span>
-                  <span className="bg-surface-muted px-2.5 py-1 rounded-lg border border-border">
-                    Day {selectedMilestone.startJourneyDay || selectedMilestone.journeyDay}
-                    {selectedMilestone.endJourneyDay && selectedMilestone.endJourneyDay !== selectedMilestone.startJourneyDay
-                      ? `–${selectedMilestone.endJourneyDay}`
-                      : ''}
-                  </span>
-                  {selectedMilestone.projectId && (
-                    <span className="inline-flex items-center gap-1 bg-accent/15 text-accent px-2.5 py-1 rounded-lg border border-accent/30">
-                      <Layers className="w-3.5 h-3.5" />
-                      Project {selectedMilestone.projectId}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Acceptance Criteria */}
-              {selectedMilestone.acceptanceCriteria && selectedMilestone.acceptanceCriteria.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-xs font-mono font-extrabold uppercase tracking-widest text-accent flex items-center gap-1.5">
-                    <CheckSquare className="w-4 h-4" />
-                    Acceptance Criteria
-                  </h4>
-                  <ul className="text-xs sm:text-sm text-ink space-y-2 bg-surface-muted p-4 sm:p-5 rounded-2xl border border-border leading-relaxed font-medium shadow-crisp-sm">
-                    {selectedMilestone.acceptanceCriteria.map((criterion, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="text-accent font-bold">✓</span>
-                        <span>{criterion}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Technologies */}
-              {selectedMilestone.technologies && selectedMilestone.technologies.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-xs font-mono font-extrabold uppercase tracking-widest text-accent">
-                    Core Technologies
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedMilestone.technologies.map((t) => (
-                      <span
-                        key={t}
-                        className="text-xs font-mono font-bold px-3 py-1 rounded-lg bg-surface-muted border border-border text-ink shadow-crisp-sm"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Topics Covered */}
-              {selectedMilestone.topicsCovered && selectedMilestone.topicsCovered.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-xs font-mono font-extrabold uppercase tracking-widest text-accent">
-                    Curriculum Focus
-                  </h4>
-                  <ul className="text-xs sm:text-sm text-ink space-y-1.5 list-disc list-inside bg-surface-muted p-4 rounded-2xl border border-border leading-relaxed font-medium shadow-crisp-sm">
-                    {selectedMilestone.topicsCovered.map((topic, i) => (
-                      <li key={i}>{topic}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Milestone Personal Notes */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between font-mono">
-                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-accent">
-                    Milestone Notes & Artifacts
-                  </h4>
-                  <button
-                    onClick={handleSaveNotes}
-                    disabled={savingNotes}
-                    className="text-xs font-bold text-accent hover:underline flex items-center gap-1.5"
-                  >
-                    <Save className="w-3.5 h-3.5" />
-                    <span>{savingNotes ? 'Saving...' : 'Save Notes'}</span>
-                  </button>
-                </div>
-                <textarea
-                  rows={3}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Record verification notes, PR links or repository URLs for this milestone..."
-                  className="w-full bg-surface-bright border-2 border-border focus:border-accent rounded-2xl p-4 text-xs sm:text-sm text-ink outline-none resize-y font-mono shadow-crisp-sm leading-relaxed"
-                />
-              </div>
-
-              {/* Automatic Progression Indicator */}
-              <div className="pt-2 border-t-2 border-border flex items-center gap-2 text-xs font-mono text-ink-muted">
-                <Lock className="w-4 h-4 text-accent shrink-0" />
-                <span>
-                  Milestone status is automated from topic completions. Manual override is disabled.
-                </span>
-              </div>
-            </div>
+            <MilestoneDetails
+              milestone={selectedMilestone}
+              milestoneCount={milestones.length}
+              notes={notes}
+              savingNotes={savingNotes}
+              onNotesChange={setNotes}
+              onSaveNotes={handleSaveNotes}
+            />
           )}
         </div>
       </div>
