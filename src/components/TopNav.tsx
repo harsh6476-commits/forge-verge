@@ -84,7 +84,7 @@ export const TopNav: React.FC<TopNavProps> = ({
       <div className="flex items-center gap-2 sm:gap-4 lg:gap-10 min-w-0">
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Black Logo with zinc-200 outline and shadow */}
-          <img className='mx-auto w-9 h-9 rounded-lg overflow-hidden border p-1 border-zinc-700 flex items-center justify-center text-[#E8D2B5] dark:text-zinc-100 font-bold text-2xl shadow-white' src="/public/Icon.png" alt="" />
+          <img className='mx-auto w-9 h-9 rounded-lg overflow-hidden border p-1 border-zinc-700 flex items-center justify-center text-[#E8D2B5] dark:text-zinc-100 font-bold text-2xl shadow-white' src="/Icon.png" alt="" />
           {/* <div className="w-9 h-9 rounded-xl bg-black text-[#E8D2B5] dark:text-zinc-100 border-2 border-zinc-200 flex items-center justify-center font-bold text-base shadow-crisp-sm">
             F
           </div> */}
