@@ -33,7 +33,7 @@ export const PinGate: React.FC<PinGateProps> = ({ onUnlock, apiUnlock }) => {
       <div className="w-full max-w-sm space-y-6 text-center bg-surface border-2 border-border p-8 rounded-3xl shadow-crisp-lg">
         {/* Black logo with zinc-200 outline and shadow */}
         <div className="mx-auto w-16 h-16 rounded-2xl p-1 overflow-hidden border-t-2 border-zinc-700 flex items-center justify-center text-[#E8D2B5] dark:text-zinc-100 font-bold text-2xl shadow-crisp">
-          <img src="/public/Icon.png" alt='icon' />
+          <img src="/Icon.png" alt='icon' />
         </div>
 
         <div className="space-y-1">
