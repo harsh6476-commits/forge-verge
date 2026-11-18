@@ -45,9 +45,7 @@ app.use(
       if (!origin) return callback(null, true);
       if (process.env.NODE_ENV !== 'production') return callback(null, true);
       if (
-        origin === CLIENT_ORIGIN ||
-        origin.endsWith('.vercel.app') ||
-        origin.includes('localhost')
+        origin === CLIENT_ORIGIN 
       ) {
         return callback(null, true);
       }
