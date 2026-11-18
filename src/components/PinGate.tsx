@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import { ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
 
 interface PinGateProps {
   onUnlock: () => void;
