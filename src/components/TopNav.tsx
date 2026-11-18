@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Flame, Bell, Lock, X } from 'lucide-react';
+import { Flame, Bell, Lock, X, Sun, Moon } from 'lucide-react';
 import { AppNotification } from '../types/api';
+import { useTheme } from '../context/ThemeContext';
 import { clsx } from 'clsx';
 
 interface TopNavProps {
@@ -18,6 +19,7 @@ export const TopNav: React.FC<TopNavProps> = ({
   onMarkRead,
 }) => {
   const [showNotifs, setShowNotifs] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -26,11 +28,11 @@ export const TopNav: React.FC<TopNavProps> = ({
       {/* Brand & Main Pages */}
       <div className="flex items-center gap-6 sm:gap-10">
         <div className="flex items-center gap-3">
-          {/* Logo */}
-          <div className="w-9 h-9 rounded-xl bg-accent text-white border-2 border-border flex items-center justify-center font-bold text-base shadow-crisp-sm">
+          {/* Black Logo with zinc-200 outline and shadow */}
+          <div className="w-9 h-9 rounded-xl bg-black text-[#E8D2B5] dark:text-zinc-100 border-2 border-zinc-200 flex items-center justify-center font-bold text-base shadow-crisp-sm">
             F
           </div>
-          <span className="font-extrabold text-base tracking-widest text-surface uppercase hidden sm:inline-block">
+          <span className="font-extrabold text-base tracking-widest text-ink uppercase hidden sm:inline-block">
             FORGE OS
           </span>
         </div>
@@ -42,10 +44,10 @@ export const TopNav: React.FC<TopNavProps> = ({
             end
             className={({ isActive }) =>
               clsx(
-                'px-4 py-2 rounded-xl font-bold transition-all border-2 shadow-crisp-sm tracking-wider',
+                'px-4 py-2 rounded-xl font-bold transition-all border-2 border-border shadow-crisp-sm tracking-wider',
                 isActive
-                  ? 'bg-accent text-white border-border shadow-crisp'
-                  : 'bg-surface text-ink hover:bg-surface-bright border-border'
+                  ? 'bg-accent text-white border-zinc-200 shadow-crisp'
+                  : 'bg-surface text-ink hover:bg-surface-bright'
               )
             }
           >
@@ -56,10 +58,10 @@ export const TopNav: React.FC<TopNavProps> = ({
             to="/topics"
             className={({ isActive }) =>
               clsx(
-                'px-4 py-2 rounded-xl font-bold transition-all border-2 shadow-crisp-sm tracking-wider',
+                'px-4 py-2 rounded-xl font-bold transition-all border-2 border-border shadow-crisp-sm tracking-wider',
                 isActive
-                  ? 'bg-accent text-white border-border shadow-crisp'
-                  : 'bg-surface text-ink hover:bg-surface-bright border-border'
+                  ? 'bg-accent text-white border-zinc-200 shadow-crisp'
+                  : 'bg-surface text-ink hover:bg-surface-bright'
               )
             }
           >
@@ -70,10 +72,10 @@ export const TopNav: React.FC<TopNavProps> = ({
             to="/milestones"
             className={({ isActive }) =>
               clsx(
-                'px-4 py-2 rounded-xl font-bold transition-all border-2 shadow-crisp-sm tracking-wider',
+                'px-4 py-2 rounded-xl font-bold transition-all border-2 border-border shadow-crisp-sm tracking-wider',
                 isActive
-                  ? 'bg-accent text-white border-border shadow-crisp'
-                  : 'bg-surface text-ink hover:bg-surface-bright border-border'
+                  ? 'bg-accent text-white border-zinc-200 shadow-crisp'
+                  : 'bg-surface text-ink hover:bg-surface-bright'
               )
             }
           >
@@ -82,13 +84,27 @@ export const TopNav: React.FC<TopNavProps> = ({
         </nav>
       </div>
 
-      {/* Right: Streak, Notification Bell, Lock */}
+      {/* Right: Streak, Theme Toggle, Notification Bell, Lock */}
       <div className="flex items-center gap-3">
         {/* Streak Pill */}
         <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-surface border-2 border-border shadow-crisp-sm text-xs font-bold text-ink tracking-wider">
-          <Flame className="w-4 h-4 text-focus fill-focus" />
+          <Flame className="w-4 h-4 text-accent fill-accent" />
           <span>{streak} {streak === 1 ? 'DAY' : 'DAYS'}</span>
         </div>
+
+        {/* Theme Toggle (Light / Dark) */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-xl border-2 border-border bg-surface text-ink hover:bg-surface-bright shadow-crisp-sm transition-all"
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
+          aria-label="Toggle theme"
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-4 h-4 text-ink" />
+          ) : (
+            <Moon className="w-4 h-4 text-ink" />
+          )}
+        </button>
 
         {/* Notifications */}
         <div className="relative">
@@ -99,7 +115,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           >
             <Bell className="w-4 h-4 text-ink" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-accent border-2 border-surface" />
+              <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-accent border-2 border-zinc-200" />
             )}
           </button>
 
@@ -151,7 +167,7 @@ export const TopNav: React.FC<TopNavProps> = ({
         {/* Lock Session */}
         <button
           onClick={onLock}
-          className="p-2 rounded-xl border-2 border-border bg-surface text-ink hover:bg-accent hover:text-white hover:border-accent shadow-crisp-sm transition-all"
+          className="p-2 rounded-xl border-2 border-border bg-surface text-ink hover:bg-accent hover:text-white hover:border-zinc-200 shadow-crisp-sm transition-all"
           title="Lock Workspace"
         >
           <Lock className="w-4 h-4" />
